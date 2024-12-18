@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace ConsoleGames
         public static void Snake()
         {
             List<int[]> snake = new List<int[]> { new int[] { 2, 1, 1 } };
-            int[,] level = CreateLevel(15, 10);
+            int[,] level = CreateLevel(40, 25);
             SpawnCoins(level, snake);
             //int cameraHeight = 10;
             //int cameraWidth = 10;
@@ -190,17 +191,11 @@ namespace ConsoleGames
         }
         public static bool isDead(List<int[]> snake)
         {
-            for (int i = 0; i < snake.Count; i++)
+            for (int i = 1; i < snake.Count; i++)
             {
-                for (int j = 0; j < snake.Count; j++)
+                if (snake[0][0] == snake[i][0] && snake[0][1] == snake[i][1])
                 {
-                    if (i != j)
-                    {
-                        if (snake[i][0] == snake[j][0] && snake[i][1] == snake[j][1])
-                        {
-                            return true;
-                        }
-                    }
+                    return true;
                 }
             }
             return false;
