@@ -1,0 +1,28 @@
+# Build Folders
+bin/
+obj/
+
+# User-specific Files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+.vs/
+
+# Logs
+*.log
+
+# Auto-generated Files
+Generated/
+
+# Secrets
+secrets.json
+
+# NuGet Packages
+packages/
+*.nupkg
+*.snupkg
+
+# Rider/JetBrains IDE Files
+.idea/
+*.iml
