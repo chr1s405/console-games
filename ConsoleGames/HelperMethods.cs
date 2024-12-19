@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -87,6 +88,48 @@ namespace ConsoleGames
                 }
                 Console.WriteLine();
             }
+        }
+        public static int indexOf(List<List<int[]>> list, int[] arr)
+        {
+            int index = -1;
+            for (int i = 0; i < list.Count; i++)
+            {
+                bool matches = true;
+                for (int j = 0; j < arr.GetLength(0); j++)
+                {
+                    if (list[i].Last()[j] != arr[j])
+                    {
+                        matches = false;
+                    }
+                }
+                if (matches)
+                {
+                    index = i;
+                    return index;
+                }
+            }
+            return index;
+        }
+        public static int indexOf(List<List<int[]>> list1, List<int[]> list2)
+        {
+            int index = -1;
+            for (int i = 0; i < list1.Count; i++)
+            {
+                bool matches = true;
+                for (int j = 0; j < list2.Count(); j++)
+                {
+                    if(indexOf(list1[i], list2[j]) == -1)
+                    {
+                        matches = false;
+                    }
+                }
+                if (matches)
+                {
+                    index = i;
+                    return index;
+                }
+            }
+            return index;
         }
         public static int indexOf(List<int[]> list, int[] arr)
         {
