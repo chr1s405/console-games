@@ -12,8 +12,8 @@ namespace ConsoleGames
         public enum Dir { up, right, down, left }
         public static void Play()
         {
-            List<int[]> snake = CreateSnake(20);
-            int[,] level = CreateLevel(40, 25);
+            List<int[]> snake = CreateSnake(1);
+            int[,] level = CreateLevel(20, 10);
             SpawnCoins(level, snake);
             //int cameraHeight = 10;
             //int cameraWidth = 10;
@@ -43,19 +43,19 @@ namespace ConsoleGames
         }
         public static int[,] CreateLevel(int levelWidth, int levelHeight)
         {
-            int[,] level = new int[levelWidth, levelHeight];
-            for (int height = 0; height < level.GetLength(1); height++)
+            int[,] level = new int[levelHeight, levelWidth];
+            for (int height = 0; height < level.GetLength(0); height++)
             {
-                for (int width = 0; width < level.GetLength(0); width++)
+                for (int width = 0; width < level.GetLength(1); width++)
                 {
-                    if (((width == 0 || width == level.GetLength(0) - 1) && (0 <= height && height < level.GetLength(1))) ||
-                    ((height == 0 || height == level.GetLength(1) - 1) && (0 <= width && width < level.GetLength(0))))
+                    if (((width == 0 || width == level.GetLength(1) - 1) && (0 <= height && height < level.GetLength(0))) ||
+                    ((height == 0 || height == level.GetLength(0) - 1) && (0 <= width && width < level.GetLength(1))))
                     {
-                        level[width, height] = 1;
+                        level[height, width] = 1;
                     }
                     else
                     {
-                        level[width, height] = 0;
+                        level[height, width] = 0;
                     }
                 }
             }
@@ -73,15 +73,14 @@ namespace ConsoleGames
         }
         public static void DrawLevel(List<int[]> snake, int coins, int[,] level, int minX = 0, int minY = 0, int maxWidth = 0, int maxHeight = 0)
         {
-            if (maxWidth == 0) { maxWidth = level.GetLength(0); }
-            if (maxHeight == 0) { maxHeight = level.GetLength(1); }
+            if (maxWidth == 0) { maxWidth = level.GetLength(1); }
+            if (maxHeight == 0) { maxHeight = level.GetLength(0); }
             for (int height = minY; height < maxHeight; height++)
             {
                 for (int width = minX; width < maxWidth; width++)
                 {
                     bool isOnSnake = false;
                     bool isHead = false;
-                    int[] pos = new int[] { width, height };
                     for (int i = 0; i < snake.Count; i++)
                     {
                         if (snake[i][0] == width && snake[i][1] == height)
@@ -107,7 +106,7 @@ namespace ConsoleGames
                     }
                     else
                     {
-                        switch (level[width, height])
+                        switch (level[height, width])
                         {
                             case 0: Console.Write("  "); break;
                             case 1: Console.Write("x "); break;
@@ -121,21 +120,21 @@ namespace ConsoleGames
         }
         public static void DrawLevel(List<int[]> snake, int coins, int cameraWidth, int cameraHeight, int[,] level)
         {
-            if (cameraWidth < level.GetLength(0) || cameraHeight < level.GetLength(1))
+            if (cameraWidth < level.GetLength(1) || cameraHeight < level.GetLength(0))
             {
-                int maxCameraX = Math.Min(level.GetLength(0), snake[0][0] + cameraWidth / 2);
-                int maxCameraY = Math.Min(level.GetLength(1), snake[0][1] + cameraHeight / 2);
+                int maxCameraX = Math.Min(level.GetLength(1), snake[0][0] + cameraWidth / 2);
+                int maxCameraY = Math.Min(level.GetLength(0), snake[0][1] + cameraHeight / 2);
                 int minCameraX = Math.Max(0, snake[0][0] - cameraWidth / 2);
                 int minCameraY = Math.Max(0, snake[0][1] - cameraHeight / 2);
-                if (level.GetLength(0) >= cameraWidth)
+                if (level.GetLength(1) >= cameraWidth)
                 {
                     if (minCameraX == 0) { maxCameraX = cameraWidth; }
-                    if (maxCameraX == level.GetLength(0)) { minCameraX = level.GetLength(0) - cameraWidth; }
+                    if (maxCameraX == level.GetLength(1)) { minCameraX = level.GetLength(1) - cameraWidth; }
                 }
                 if (level.GetLength(1) >= cameraHeight)
                 {
                     if (minCameraY == 0) { maxCameraY = cameraHeight; }
-                    if (maxCameraY == level.GetLength(1)) { minCameraY = level.GetLength(1) - cameraHeight; }
+                    if (maxCameraY == level.GetLength(0)) { minCameraY = level.GetLength(0) - cameraHeight; }
                 }
                 DrawLevel(snake, coins, level, minCameraX, minCameraY, maxCameraX, maxCameraY);
             }
@@ -164,13 +163,13 @@ namespace ConsoleGames
                     snake[i][0]--;
                     if (snake[i][0] < 1)
                     {
-                        snake[i][0] = level.GetLength(0) - 2;
+                        snake[i][0] = level.GetLength(1) - 2;
                     }
                 }
                 if ((Dir)snake[i][2] == Dir.right)
                 {
                     snake[i][0]++;
-                    if (snake[i][0] > level.GetLength(0) - 2)
+                    if (snake[i][0] > level.GetLength(1) - 2)
                     {
                         snake[i][0] = 1;
                     }
@@ -180,13 +179,13 @@ namespace ConsoleGames
                     snake[i][1]--;
                     if (snake[i][1] < 1)
                     {
-                        snake[i][1] = level.GetLength(1) - 2;
+                        snake[i][1] = level.GetLength(0) - 2;
                     }
                 }
                 if ((Dir)snake[i][2] == Dir.down)
                 {
                     snake[i][1]++;
-                    if (snake[i][1] > level.GetLength(1) - 2)
+                    if (snake[i][1] > level.GetLength(0) - 2)
                     {
                         snake[i][1] = 1;
                     }
@@ -217,8 +216,8 @@ namespace ConsoleGames
             do
             {
                 isOnSnake = false;
-                x = rand.Next(1, level.GetLength(0) - 1);
-                y = rand.Next(1, level.GetLength(1) - 1);
+                x = rand.Next(1, level.GetLength(1) - 1);
+                y = rand.Next(1, level.GetLength(0) - 1);
                 for (int i = 0; i < snake.Count; i++)
                 {
                     if (x == snake[i][0] && y == snake[i][1])
@@ -227,14 +226,14 @@ namespace ConsoleGames
                     }
                 }
             } while (isOnSnake);
-            level[x, y] = 9;
+            level[y, x] = 9;
         }
         public static bool CollectCoin(int[,] level, int[] pos, ref int coins)
         {
-            if (level[pos[0], pos[1]] == 9)
+            if (level[pos[1], pos[0]] == 9)
             {
                 coins++;
-                level[pos[0], pos[1]] = 0;
+                level[pos[1], pos[0]] = 0;
 
                 return true;
             }
