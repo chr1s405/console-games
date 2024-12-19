@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace ConsoleGames
 {
-    internal class snake
+    internal class Snake
     {
         public enum Dir { up, right, down, left }
-        public static void Snake()
+        public static void Play()
         {
-            List<int[]> snake = new List<int[]> { new int[] { 2, 1, 1 } };
+            List<int[]> snake = CreateSnake(20);
             int[,] level = CreateLevel(40, 25);
             SpawnCoins(level, snake);
             //int cameraHeight = 10;
@@ -57,11 +57,19 @@ namespace ConsoleGames
                     {
                         level[width, height] = 0;
                     }
-                    Console.Write(level[width, height]);
                 }
-                Console.WriteLine();
             }
             return level;
+        }
+        public static List<int[]> CreateSnake(int size)
+        {
+            List<int[]> snake = new List<int[]>();
+            for (int i = 0; i < size; i++)
+            {
+                snake.Add([size - i, 1, 1]);
+            }
+            return snake;
+
         }
         public static void DrawLevel(List<int[]> snake, int coins, int[,] level, int minX = 0, int minY = 0, int maxWidth = 0, int maxHeight = 0)
         {
@@ -85,15 +93,15 @@ namespace ConsoleGames
                     }
                     if (isOnSnake)
                     {
-                        Console.BackgroundColor = ConsoleColor.Green;
+                            Console.BackgroundColor = ConsoleColor.Green;
                         if (isHead)
                         {
                             Console.ForegroundColor = ConsoleColor.DarkGreen;
-                            Console.Write("o");
+                            Console.Write("[]");
                         }
                         else
                         {
-                            Console.Write(" ");
+                            Console.Write("  ");
                         }
                         Console.ResetColor();
                     }
@@ -101,9 +109,9 @@ namespace ConsoleGames
                     {
                         switch (level[width, height])
                         {
-                            case 0: Console.Write(" "); break;
-                            case 1: Console.Write("x"); break;
-                            case 9: Console.Write("o"); break;
+                            case 0: Console.Write("  "); break;
+                            case 1: Console.Write("x "); break;
+                            case 9: Console.Write("o "); break;
                         }
                     }
                 }

@@ -10,7 +10,7 @@ namespace ConsoleGames
     {
         static void Main(string[] args)
         {
-            snake.Snake();
+            Snake.Play();
         }
     }
 }
