@@ -23,12 +23,15 @@ namespace ConsoleGames
                 Console.Clear();
                 switch (choice)
                 {
-                    case 1: Snake.Play();break;
-                    case 2: pathFinding.PathFind ();break;
+                    case 1: Snake.Play(); break;
+                    case 2: pathFinding.PathFind(); break;
                 }
-                Console.WriteLine($"Press enter to continue");
-                Console.ReadLine();
-                Console.Clear();
+                if (choice != 0)
+                {
+                    Console.WriteLine($"Press enter to continue");
+                    Console.ReadLine();
+                    Console.Clear();
+                }
             } while (choice != 0);
         }
     }
