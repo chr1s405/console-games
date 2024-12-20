@@ -18,7 +18,7 @@ namespace ConsoleGames
                 Console.WriteLine("1. Snake");
                 Console.WriteLine("2. PathFinding");
                 Console.WriteLine("0. quit");
-                Console.Write("Select optiion: ");
+                Console.Write("Select option: ");
                 choice = Convert.ToInt32(Console.ReadLine());
                 Console.Clear();
                 switch (choice)
@@ -26,6 +26,8 @@ namespace ConsoleGames
                     case 1: Snake.Play();break;
                     case 2: pathFinding.PathFind ();break;
                 }
+                Console.WriteLine($"Press enter to continue");
+                Console.ReadLine();
                 Console.Clear();
             } while (choice != 0);
         }
