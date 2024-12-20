@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using static ConsoleGames.Program;
 using Microsoft.Win32.SafeHandles;
+using System.Xml.Serialization;
 
 namespace ConsoleGames
 {
@@ -10,8 +11,23 @@ namespace ConsoleGames
     {
         static void Main(string[] args)
         {
-            //Snake.Play();
-            pathFinding.PathFind();
+            int choice;
+            do
+            {
+                Console.WriteLine("MENU");
+                Console.WriteLine("1. Snake");
+                Console.WriteLine("2. PathFinding");
+                Console.WriteLine("0. quit");
+                Console.Write("Select optiion: ");
+                choice = Convert.ToInt32(Console.ReadLine());
+                Console.Clear();
+                switch (choice)
+                {
+                    case 1: Snake.Play();break;
+                    case 2: pathFinding.PathFind ();break;
+                }
+                Console.Clear();
+            } while (choice != 0);
         }
     }
 }

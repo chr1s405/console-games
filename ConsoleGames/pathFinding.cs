@@ -12,13 +12,6 @@ namespace ConsoleGames
     {
         public static void PathFind()
         {
-            //List<List<int[]>> list1 = new List<List<int[]>>{
-            //new List<int[]>{new int[] { 8, 2 }},
-            //new List<int[]>{new int[] { 3, 4 }},
-            //new List<int[]>{new int[] { 8, 7 }}};
-            //int[] arr = new int[] { 1,2 };
-            //Console.WriteLine(indexOf(list1, arr));
-            Console.ResetColor();
             int[] pos1 = new int[] { 10, 2 };
             int[] pos2 = new int[] { 15, 5 };
             int[,] level = CreateLevel(pos1, pos2);
