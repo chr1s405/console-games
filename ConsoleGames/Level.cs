@@ -35,7 +35,6 @@ namespace ConsoleGames
             m_height = height;
             m_level = Create();
         }
-
         public int[,] Create()
         {
             int[,] level = new int[m_height, m_width];
@@ -56,8 +55,17 @@ namespace ConsoleGames
             }
             return level;
         }
+        public void Modify(int x, int y, int value)
+        {
+            m_level[y, x] = value;
+        }
+        public int GetValue(int x, int y)
+        {
+            return m_level[y, x];
+        }
         public void Draw(int[] pos1, int[] pos2, List<int[]> path)
         {
+            Console.Clear();
             for (int heightIdx = 0; heightIdx < m_height; heightIdx++)
             {
                 for (int widthIdx = 0; widthIdx < m_width; widthIdx++)
@@ -107,6 +115,7 @@ namespace ConsoleGames
         }
         public void Draw(List<int[]> snake)
         {
+            Console.Clear();
             for (int heightIdx = 0; heightIdx < m_height; heightIdx++)
             {
                 for (int widthIdx = 0; widthIdx < m_width; widthIdx++)

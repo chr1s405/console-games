@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,23 +13,22 @@ namespace ConsoleGames
         public enum Dir { up, right, down, left }
         public static void Play()
         {
-            List<int[]> snake = CreateSnake(1);
-            Level level = new Level(20, 10);
-            SpawnCoins(level.GetLevel, snake);
+            Level level = new Level(22, 12);
+            List<int[]> snake = CreateSnake(level, 1);
+            SpawnCoins(level, snake);
             int coins = 0;
             bool isEnd = false;
             while (!isEnd)
             {
-                Move(level.GetLevel, ref snake);
-                if (CollectCoin(level.GetLevel, snake, ref coins))
+                Move(level, snake);
+                if (CollectCoin(level, snake, ref coins))
                 {
-                    SpawnCoins(level.GetLevel, snake);
+                    SpawnCoins(level, snake);
                 }
                 if (isDead(snake))
                 {
                     isEnd = true;
                 }
-                Console.Clear();
                 level.Draw(snake);
                 Console.WriteLine(coins);
 
@@ -36,17 +36,29 @@ namespace ConsoleGames
             }
             Console.WriteLine($"your total score is {coins}");
         }
-        public static List<int[]> CreateSnake(int size)
+        public static List<int[]> CreateSnake(Level level, int size)
         {
+            int x = 5;
+            int y = size / (level.Width-2) + 2;
             List<int[]> snake = new List<int[]>();
             for (int i = 0; i < size; i++)
             {
-                snake.Add([size - i, 1, 1]);
+                if (x < 1)
+                {
+                    y--;
+                    snake.Add([1, y, (int)Dir.down]);
+                    x = level.Width - 1;
+                }
+                else
+                {
+                    snake.Add([x, y, (int)Dir.right]);
+                }
+                x--;
             }
             return snake;
 
         }
-        public static void Move(int[,] level, ref List<int[]> snake)
+        public static void Move(Level level, List<int[]> snake)
         {
             if (Console.KeyAvailable)
             {
@@ -66,13 +78,13 @@ namespace ConsoleGames
                     snake[i][0]--;
                     if (snake[i][0] < 1)
                     {
-                        snake[i][0] = level.GetLength(1) - 2;
+                        snake[i][0] = level.Width - 2;
                     }
                 }
                 if ((Dir)snake[i][2] == Dir.right)
                 {
                     snake[i][0]++;
-                    if (snake[i][0] > level.GetLength(1) - 2)
+                    if (snake[i][0] > level.Width - 2)
                     {
                         snake[i][0] = 1;
                     }
@@ -82,13 +94,13 @@ namespace ConsoleGames
                     snake[i][1]--;
                     if (snake[i][1] < 1)
                     {
-                        snake[i][1] = level.GetLength(0) - 2;
+                        snake[i][1] = level.Height - 2;
                     }
                 }
                 if ((Dir)snake[i][2] == Dir.down)
                 {
                     snake[i][1]++;
-                    if (snake[i][1] > level.GetLength(0) - 2)
+                    if (snake[i][1] > level.Height - 2)
                     {
                         snake[i][1] = 1;
                     }
@@ -110,7 +122,7 @@ namespace ConsoleGames
             }
             return false;
         }
-        public static void SpawnCoins(int[,] level, List<int[]> snake)
+        public static void SpawnCoins(Level level, List<int[]> snake)
         {
             Random rand = new Random();
             bool isOnSnake = true;
@@ -119,8 +131,8 @@ namespace ConsoleGames
             do
             {
                 isOnSnake = false;
-                x = rand.Next(1, level.GetLength(1) - 1);
-                y = rand.Next(1, level.GetLength(0) - 1);
+                x = rand.Next(1, level.Width - 1);
+                y = rand.Next(1, level.Height - 1);
                 for (int i = 0; i < snake.Count; i++)
                 {
                     if (x == snake[i][0] && y == snake[i][1])
@@ -129,20 +141,20 @@ namespace ConsoleGames
                     }
                 }
             } while (isOnSnake);
-            level[y, x] = 9;
+            level.Modify(x, y, 9);
         }
-        public static bool CollectCoin(int[,] level, int[] pos, ref int coins)
+        public static bool CollectCoin(Level level, int[] pos, ref int coins)
         {
-            if (level[pos[1], pos[0]] == 9)
+            if (level.GetValue(pos[0], pos[1]) == 9)
             {
                 coins++;
-                level[pos[1], pos[0]] = 0;
+                level.Modify(pos[0], pos[1], 0);
 
                 return true;
             }
             return false;
         }
-        public static bool CollectCoin(int[,] level, List<int[]> snake, ref int coins)
+        public static bool CollectCoin(Level level, List<int[]> snake, ref int coins)
         {
             if (CollectCoin(level, snake[0], ref coins))
             {
