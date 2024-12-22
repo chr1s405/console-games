@@ -24,7 +24,7 @@ namespace ConsoleGames
                 switch (choice)
                 {
                     case 1: Snake.Play(); break;
-                    case 2: pathFinding.PathFind(); break;
+                    case 2: Pathfinding.PathFind(); break;
                 }
                 if (choice != 0)
                 {

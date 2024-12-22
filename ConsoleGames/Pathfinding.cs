@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ConsoleGames
 {
-    class pathFinding
+    class Pathfinding
     {
         public static void PathFind()
         {
@@ -17,14 +17,12 @@ namespace ConsoleGames
             Level level = CreateLevel();
             List<int[]> path = new List<int[]>();
             path.Add(pos1);
-            path = FindPath(ref path, level, pos1, pos2);
+            path = FindPath(path, level, pos1, pos2);
             for (int i = 0; i < path.Count; i++)
             {
-                for (int j = 0; j < path[i].GetLength(0); j++)
-                {
-                    Console.Write(path[i][j] + " ");
-                }
-                Console.WriteLine();
+                pos1 = path[i];
+                level.Draw(pos1, pos2, path);
+                System.Threading.Thread.Sleep(50);   
             }
 
 
@@ -46,7 +44,7 @@ namespace ConsoleGames
             });
         }
         
-        public static List<int[]> FindPath(ref List<int[]> path, Level level, int[] start, int[] end, double dist = 0)
+        public static List<int[]> FindPath(List<int[]> path, Level level, int[] start, int[] end)
         {
             int counter = 0;
             List<List<int[]>> visited = new List<List<int[]>>();
@@ -90,9 +88,8 @@ namespace ConsoleGames
                     queued.Add(path4);
                 }
                 visited.Add(currPath);
-                Console.Clear();
                 level.Draw(start, end, visited.Last());
-                System.Threading.Thread.Sleep(100);
+                System.Threading.Thread.Sleep(20);
             }
             return visited.Last();
         }
