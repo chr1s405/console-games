@@ -10,18 +10,24 @@ namespace ConsoleGames
 {
     class Pathfinding
     {
+        static List<LevelCell> levelCells = new List<LevelCell>{
+                new LevelCell(2,"  ", ConsoleColor.Green),
+                new LevelCell(3,"  ", ConsoleColor.Red),
+                new LevelCell(4,"  ", ConsoleColor.Gray),
+            };
         public static void PathFind()
         {
-            int[] pos1 = new int[] { 10, 2 };
-            int[] pos2 = new int[] { 15, 5 };
+            
             Level level = CreateLevel();
+            int[] start = new int[] { 10, 2 };
+            int[] end = new int[] { 15, 5 };
             List<int[]> path = new List<int[]>();
-            path.Add(pos1);
-            path = FindPath(path, level, pos1, pos2);
+            path.Add(start);
+            path = FindPath(path, level, start, end);
             for (int i = 0; i < path.Count; i++)
             {
-                pos1 = path[i];
-                level.Draw(pos1, pos2, path);
+                start = path[i];
+                level.Draw(path, start, end, levelCells);
                 System.Threading.Thread.Sleep(50);   
             }
 
@@ -68,7 +74,7 @@ namespace ConsoleGames
                 {
                     continue;
                 }
-                else if (level.GetLevel[currPath.Last()[1], currPath.Last()[0]] == 1)
+                else if (level.LevelAccesor[currPath.Last()[1], currPath.Last()[0]] == 1)
                 {
                     continue;
                 }
@@ -88,7 +94,7 @@ namespace ConsoleGames
                     queued.Add(path4);
                 }
                 visited.Add(currPath);
-                level.Draw(start, end, visited.Last());
+                level.Draw(visited.Last(), start, end, levelCells);
                 System.Threading.Thread.Sleep(20);
             }
             return visited.Last();

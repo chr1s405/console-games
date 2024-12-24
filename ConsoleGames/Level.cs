@@ -7,14 +7,32 @@ using System.Threading.Tasks;
 
 namespace ConsoleGames
 {
+    public struct LevelCell
+    {
+        int cellId;
+        string cellString;
+        ConsoleColor cellColor;
+        public LevelCell(int id, string s, ConsoleColor color = ConsoleColor.Black)
+        {
+            CellId = id;
+            CellString = s;
+            CellColor = color;
+        }
+
+        public int CellId { get => cellId; set => cellId = value; }
+        public string CellString { get => cellString; set => cellString = value; }
+        public ConsoleColor CellColor { get => cellColor; set => cellColor = value; }
+    }
     internal class Level
     {
         public int Width { get { return m_width; } }
         int m_width;
         int m_height;
-        public int Height { get { return m_height; } }
         int[,] m_level;
-        public int[,] GetLevel { get { return m_level; } set { m_level = value; } }
+        int[,] m_levelAdpt;
+        public int Height { get { return m_height; } }
+        public int[,] LevelAccesor { get { return m_level; } set { m_level = value; } }
+        public int[,] LevelAdpt { get { return m_levelAdpt; } set { m_levelAdpt = value; } }
         public enum Legend
         {
             empty = 0,
@@ -25,6 +43,7 @@ namespace ConsoleGames
             m_level = level;
             m_width = level.GetLength(1);
             m_height = level.GetLength(0);
+            m_levelAdpt = new int[Height, Width];
         }
         public Level(int size) : this(size, size)
         {
@@ -34,6 +53,7 @@ namespace ConsoleGames
             m_width = width;
             m_height = height;
             m_level = Create();
+            m_levelAdpt = new int[height, width];
         }
         public int[,] Create()
         {
@@ -55,55 +75,49 @@ namespace ConsoleGames
             }
             return level;
         }
-        public void Modify(int x, int y, int value)
+        public void Draw(List<int[]> snake, int[] coin, List<LevelCell> cells = null)
         {
-            m_level[y, x] = value;
+            cells ??= new List<LevelCell>();
+            for (int i = 0; i < snake.Count; i++)
+            {
+                m_levelAdpt[snake[i][1], snake[i][0]] = 4;
+            }
+            m_levelAdpt[snake[0][1], snake[0][0]] = 3;
+            m_levelAdpt[coin[1], coin[0]] = 2;
+            Draw(cells);
         }
-        public int GetValue(int x, int y)
+        public void Draw(List<int[]> path, int[] start, int[] end, List<LevelCell> cells = null)
         {
-            return m_level[y, x];
+            cells ??= new List<LevelCell>();
+            for (int i = 0; i < path.Count; i++)
+            {
+                m_levelAdpt[path[i][1], path[i][0]] = 4;
+            }
+            m_levelAdpt[start[1], start[0]] = 2;
+            m_levelAdpt[end[1], end[0]] = 3;
+            Draw(cells);
         }
-        public void Draw(int[] pos1, int[] pos2, List<int[]> path)
+        public void Draw(List<LevelCell> cells)
         {
             Console.Clear();
             for (int heightIdx = 0; heightIdx < m_height; heightIdx++)
             {
                 for (int widthIdx = 0; widthIdx < m_width; widthIdx++)
                 {
-                    bool isPath = false;
-                    for (int i = 0; i < path.Count; i++)
+                    bool handled = false;
+                    for (int i = 0; i < cells.Count; i++)
                     {
-                        if ((path[i][1] == heightIdx && path[i][0] == widthIdx))
+                        if (m_levelAdpt[heightIdx, widthIdx] == cells[i].CellId)
                         {
-                            isPath = true;
-                            break;
+                            Console.BackgroundColor = cells[i].CellColor;
+                            Console.Write(cells[i].CellString);
+                            Console.ResetColor();
+                            handled = true;
                         }
                     }
-                    if (pos1[1] == heightIdx && pos1[0] == widthIdx)
+                    if (!handled)
                     {
-                        Console.BackgroundColor = ConsoleColor.Green;
-                        Console.Write("  ");
-                        Console.ResetColor();
-                    }
-                    else if (pos2[1] == heightIdx && pos2[0] == widthIdx)
-                    {
-                        Console.BackgroundColor = ConsoleColor.Red;
-                        Console.Write("  ");
-                        Console.ResetColor();
-                    }
-                    else if (isPath)
-                    {
-                        Console.BackgroundColor = ConsoleColor.Gray;
-                        Console.Write("  ");
-                        Console.ResetColor();
-                    }
-                    else if (m_level[heightIdx, widthIdx] == 9)
-                    {
-                        Console.Write("o ");
-                    }
-                    else
-                    {
-                        switch (m_level[heightIdx, widthIdx])
+                        switch (m_levelAdpt[heightIdx, widthIdx])
                         {
                             case 1: Console.Write("x "); break;
                             default: Console.Write("  "); break;
@@ -112,51 +126,20 @@ namespace ConsoleGames
                 }
                 Console.WriteLine();
             }
+            m_levelAdpt = (int[,])m_level.Clone();
         }
-        public void Draw(List<int[]> snake)
+        public void Debug()
         {
-            Console.Clear();
             for (int heightIdx = 0; heightIdx < m_height; heightIdx++)
             {
                 for (int widthIdx = 0; widthIdx < m_width; widthIdx++)
                 {
-                    bool isOnSnake = false;
-                    bool isHead = false;
-                    for (int i = 0; i < snake.Count; i++)
-                    {
-                        if (snake[i][0] == widthIdx && snake[i][1] == heightIdx)
-                        {
-                            isOnSnake = true;
-                            isHead = (i == 0);
-                            break;
-                        }
-                    }
-                    if (isOnSnake)
-                    {
-                        Console.BackgroundColor = ConsoleColor.Green;
-                        if (isHead)
-                        {
-                            Console.ForegroundColor = ConsoleColor.DarkGreen;
-                            Console.Write("[]");
-                        }
-                        else
-                        {
-                            Console.Write("  ");
-                        }
-                        Console.ResetColor();
-                    }
-                    else if (m_level[heightIdx, widthIdx] == 9)
-                    {
-                        Console.Write("o ");
-                    }
-                    else
-                    {
-                        switch (m_level[heightIdx, widthIdx])
-                        {
-                            case 1: Console.Write("x "); break;
-                            default: Console.Write("  "); break;
-                        }
-                    }
+                    Console.Write(m_level[heightIdx, widthIdx] + " ");
+                }
+                Console.Write("\t");
+                for (int widthIdx = 0; widthIdx < m_width; widthIdx++)
+                {
+                    Console.Write(m_levelAdpt[heightIdx, widthIdx] + " ");
                 }
                 Console.WriteLine();
             }
