@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace ConsoleGames
 {
@@ -45,9 +46,7 @@ namespace ConsoleGames
             m_height = level.GetLength(0);
             m_levelAdpt = new int[Height, Width];
         }
-        public Level(int size) : this(size, size)
-        {
-        }
+        public Level(int size) : this(size, size) { }
         public Level(int width, int height)
         {
             m_width = width;
@@ -75,8 +74,23 @@ namespace ConsoleGames
             }
             return level;
         }
+        public void Draw(int[] player, List<int[]> obstacles, List<LevelCell> cells = null)
+        {
+            m_levelAdpt = (int[,])m_level.Clone();
+            cells ??= new List<LevelCell>();
+            for (int i = 0; i < obstacles.Count; i++)
+            {
+                if (obstacles[i][0] < Width)
+                {
+                    m_levelAdpt[obstacles[i][1], obstacles[i][0]] = obstacles[i][2];
+                }
+            }
+            m_levelAdpt[player[1], player[0]] = 2;
+            Draw(cells);
+        }
         public void Draw(List<int[]> snake, int[] coin, List<LevelCell> cells = null)
         {
+            m_levelAdpt = (int[,])m_level.Clone();
             cells ??= new List<LevelCell>();
             for (int i = 0; i < snake.Count; i++)
             {
@@ -88,6 +102,7 @@ namespace ConsoleGames
         }
         public void Draw(List<int[]> path, int[] start, int[] end, List<LevelCell> cells = null)
         {
+            m_levelAdpt = (int[,])m_level.Clone();
             cells ??= new List<LevelCell>();
             for (int i = 0; i < path.Count; i++)
             {
@@ -126,7 +141,6 @@ namespace ConsoleGames
                 }
                 Console.WriteLine();
             }
-            m_levelAdpt = (int[,])m_level.Clone();
         }
         public void Debug()
         {
@@ -134,12 +148,12 @@ namespace ConsoleGames
             {
                 for (int widthIdx = 0; widthIdx < m_width; widthIdx++)
                 {
-                    Console.Write(m_level[heightIdx, widthIdx] + " ");
+                    Console.Write(m_levelAdpt[heightIdx, widthIdx] + " ");
                 }
                 Console.Write("\t");
                 for (int widthIdx = 0; widthIdx < m_width; widthIdx++)
                 {
-                    Console.Write(m_levelAdpt[heightIdx, widthIdx] + " ");
+                    Console.Write(m_level[heightIdx, widthIdx] + " ");
                 }
                 Console.WriteLine();
             }
