@@ -15,7 +15,7 @@ namespace ConsoleGames
             do
             {
                 Console.WriteLine("MENU");
-                Console.WriteLine("1. NoWifiGame");
+                Console.WriteLine("1. GravityGame");
                 Console.WriteLine("2. Snake");
                 Console.WriteLine("3. PathFinding");
                 Console.WriteLine("0. quit");

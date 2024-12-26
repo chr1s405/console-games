@@ -134,7 +134,7 @@ namespace ConsoleGames
                     {
                         switch (m_levelAdpt[heightIdx, widthIdx])
                         {
-                            case 1: Console.Write("x "); break;
+                            case 1: Console.Write("[]"); break;
                             default: Console.Write("  "); break;
                         }
                     }
