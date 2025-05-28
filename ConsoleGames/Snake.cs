@@ -38,7 +38,11 @@ namespace ConsoleGames
                 {
                     isEnd = true;
                 }
-                level.Draw(snake, coin, levelCells);
+                level.Reset();
+                level.Edit(snake, 4);
+                level.Edit(snake[0], 3);
+                level.Edit(coin, 2);
+                level.Draw(levelCells);
                 Console.WriteLine(coins);
 
                 System.Threading.Thread.Sleep(100);

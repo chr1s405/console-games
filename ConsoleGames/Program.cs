@@ -18,15 +18,23 @@ namespace ConsoleGames
                 Console.WriteLine("1. GravityGame");
                 Console.WriteLine("2. Snake");
                 Console.WriteLine("3. PathFinding");
+                //Console.WriteLine("4. PathMap");
                 Console.WriteLine("0. quit");
                 Console.Write("Select option: ");
-                choice = Convert.ToInt32(Console.ReadLine());
+                try
+                {
+                    choice = Convert.ToInt32(Console.ReadLine());
+                }
+                catch
+                {
+                    choice = 0;
+                }
                 Console.Clear();
                 switch (choice)
                 {
                     case 1: GravityGame.Play(); break;
                     case 2: Snake.Play(); break;
-                    case 3: Pathfinding.PathFind(); break;
+                    case 3: Pathfinding.Play(); break;
                 }
                 if (choice != 0)
                 {

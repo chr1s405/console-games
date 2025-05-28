@@ -30,7 +30,13 @@ namespace ConsoleGames
                 {
                     isEnd = true;
                 }
-                level.Draw(player, tileSets, levelCells);
+                level.Reset();
+                for (int i = 0; i < tileSets.Count(); i++)
+                {
+                    level.Edit(tileSets[i][0], tileSets[i][1], tileSets[i][2]);
+                }
+                level.Edit(player, 2);
+                level.Draw(levelCells);
                 Console.WriteLine(score);
                 System.Threading.Thread.Sleep(speed);
                 score++;
@@ -196,7 +202,7 @@ namespace ConsoleGames
                 //xxxxxxxxxx                    xxxxxxxxxx//
                 tileSet.AddRange(CreatePlatform(level, 0, 20, 10, 0));
                 tileSet.AddRange(CreatePlatform(level, 0, 20, 10, level.Height - 1));
-                for (int i = 0; i < (level.Height - 1)/2; i++)
+                for (int i = 0; i < (level.Height - 1) / 2; i++)
                 {
                     tileSet.AddRange(CreatePlatform(level, 1, 5, 12 + i * 4, 2 + 2 * i));
                 }
@@ -240,7 +246,7 @@ namespace ConsoleGames
                         for (int i = 0; i < tileSet.Count; i++)
                         {
                             tileSet[i][1] = level.Height - 1 - tileSet[i][1];
-                        };break;
+                        }; break;
                 }
 
             }

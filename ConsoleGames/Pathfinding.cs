@@ -15,9 +15,9 @@ namespace ConsoleGames
                 new LevelCell(3,"  ", ConsoleColor.Red),
                 new LevelCell(4,"  ", ConsoleColor.Gray),
             };
-        public static void PathFind()
+        public static void Play()
         {
-            
+
             Level level = CreateLevel();
             int[] start = new int[] { 10, 2 };
             int[] end = new int[] { 15, 5 };
@@ -27,8 +27,12 @@ namespace ConsoleGames
             for (int i = 0; i < path.Count; i++)
             {
                 start = path[i];
-                level.Draw(path, start, end, levelCells);
-                System.Threading.Thread.Sleep(50);   
+                level.Reset();
+                level.Edit(path, 4);
+                level.Edit(start, 2);
+                level.Edit(end, 3);
+                level.Draw(levelCells);
+                System.Threading.Thread.Sleep(50);
             }
 
 
@@ -49,7 +53,7 @@ namespace ConsoleGames
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
             });
         }
-        
+
         public static List<int[]> FindPath(List<int[]> path, Level level, int[] start, int[] end)
         {
             int counter = 0;
@@ -67,7 +71,6 @@ namespace ConsoleGames
                 queued.Remove(queued.First());
                 if (currPath.Last()[0] == end[0] && currPath.Last()[1] == end[1])
                 {
-                    Console.WriteLine("found");
                     queued.Clear();
                 }
                 else if (visited.Count != 0 && isPresent(visited, currPath.Last()))
@@ -94,13 +97,17 @@ namespace ConsoleGames
                     queued.Add(path4);
                 }
                 visited.Add(currPath);
-                level.Draw(visited.Last(), start, end, levelCells);
+                level.Reset();
+                level.Edit(visited.Last(), 4);
+                level.Edit(start, 2);
+                level.Edit(end, 3);
+                level.Draw(levelCells);
                 System.Threading.Thread.Sleep(20);
             }
             return visited.Last();
         }
         public static bool isPresent(List<List<int[]>> list, int[] arr)
-        { 
+        {
             for (int i = 0; i < list.Count; i++)
             {
                 bool matches = true;
