@@ -23,21 +23,23 @@ namespace ConsoleGames
             Level level = new Level(22, 12, levelCells);
             Snake snake = new Snake();
             Point2I coin = SpawnCoin(level, snake);
+            int score = 0;
             level.Edit(coin, 2);
             bool isEnd = false;
             while (!isEnd)
             {
-                if (snake.Eat(level, coin))
+                level.Edit(snake.Body.Last(), 0);
+                Move(snake, level);
+                if (snake.Body[0] == coin)
                 {
-                    level.Edit(coin, 4);
+                    score++;
                     coin = SpawnCoin(level, snake);
                     level.Edit(coin, 2);
                 }
-                level.Edit(snake.Body.Last(), 0);
-                Move(snake, level);
-                level.Edit(snake.Body[0], 4);
+                level.Edit(snake.Body[0], 3);
+                level.Edit(snake.Body[1], 4);
                 level.Draw();
-                level.PrintLevel();
+                Console.WriteLine($"score: {score}");
                 if (isDead(snake))
                 {
                     isEnd = true;
@@ -114,43 +116,21 @@ namespace ConsoleGames
             {
                 Body.Add((2, 2));
                 direction.Add(Dir.right);
-            }
-
-            public void Grow(Level level)
-            {
-                Body.Add(Body.Last() - direction.Last());
-                direction.Add(direction.Last());
-                if (Body.Last().X == 0)
-                    Body[Body.Count - 1] = (level.Width - 2, Body.Last().Y);
-
-                if (Body.Last().Y == 0)
-                    Body[Body.Count - 1] = (Body.Last().X, level.Height - 2);
-
-                if (Body.Last().X == level.Width - 1)
-                    Body[Body.Count - 1] = (1, Body.Last().Y);
-
-                if (Body.Last().Y == level.Height - 1)
-                    Body[Body.Count - 1] = (Body.Last().X, 1);
+                Body.Add((1, 2));
+                direction.Add(Dir.right);
             }
             public void Move(Dir newDir, Level level)
             {
                 Body.Insert(0, Body[0] + newDir);
                 direction.Insert(0, newDir);
-                Body.RemoveAt(Body.Count - 1);
-                direction.RemoveAt(Body.Count - 1);
+                if (level.LevelGrid[Body[0].X, Body[0].Y] != 2) {
+                    Body.RemoveAt(Body.Count - 1);
+                    direction.RemoveAt(Body.Count - 1);
+                }
                 if (Body[0].X == 0) { Body[0] = (level.Width - 2, Body[0].Y); }
                 if (Body[0].Y == 0) { Body[0] = (Body[0].X, level.Height - 2); }
                 if (Body[0].X == level.Width - 1) { Body[0] = (1, Body[0].Y); }
                 if (Body[0].Y == level.Height - 1) { Body[0] = (Body[0].X, 1); }
-            }
-            public bool Eat(Level level, Point2I collectible) 
-            { 
-                if (Body[0] == collectible)
-                {
-                    Grow(level);
-                    return true;
-                }
-                return false;
             }
         }
     }
