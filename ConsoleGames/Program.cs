@@ -31,7 +31,7 @@ namespace ConsoleGames
                     Console.Clear();
                     switch (choice)
                     {
-                        case 1: GravityGame.Play(); break;
+                        //case 1: GravityGame.Play(); break;
                         case 2: SnakeGame.Play(); break;
                         case 3: Pathfinding.Play(); break;
                         case -1: TryingThingsOut(); break;

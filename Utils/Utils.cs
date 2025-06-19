@@ -1,4 +1,6 @@
-﻿namespace Utils
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Utils
 {
     public enum Dir { up, right, down, left }
     public struct Point2I
@@ -64,6 +66,13 @@
         public override string ToString()
         {
             return $"({x}, {y})";
+        }
+        public override bool Equals(object? obj)
+        {
+            if (obj is null || !(obj is Point2I))
+                return false;
+
+            return ((Point2I)obj).X == X && ((Point2I)obj).y == Y;
         }
     }
 }

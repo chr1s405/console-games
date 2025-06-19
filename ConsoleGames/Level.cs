@@ -40,6 +40,21 @@ namespace ConsoleGames
         public int ConsoleY { get => consoleY; set => consoleY = value; }
         public List<LevelCell> LevelCells { get => levelCells; set => levelCells = value; }
 
+        public Level(int[,] level, List<LevelCell> cells = null)
+        {
+            Width = level.GetLength(1);
+            Height = level.GetLength(0);
+            InitLevel(level);
+            LevelCells.Add(new LevelCell(0, "  "));
+            LevelCells.Add(new LevelCell(1, "[]"));
+            if (cells is not null)
+            {
+                foreach (LevelCell cell in cells)
+                {
+                    LevelCells.Add(cell);
+                }
+            }
+        }
         public Level(int width, int height, List<LevelCell> cells = null)
         {
             Width = width;
@@ -72,6 +87,19 @@ namespace ConsoleGames
             for (int i = 0; i < Width; i++) { LevelGrid[i, Height - 1] = 1; }
             for (int i = 0; i < Height; i++) { LevelGrid[0, i] = 1; }
             for (int i = 0; i < Height; i++) { LevelGrid[Width - 1, i] = 1; }
+        }
+        public void InitLevel(int[,] level)
+        {
+            ConsoleX = Console.GetCursorPosition().Left;
+            ConsoleY = Console.GetCursorPosition().Top;
+            LevelGrid = new int[Width, Height];
+            for (int y = 0; y < Height; y++)
+            {
+                for (int x = 0; x < Width; x++)
+                {
+                    LevelGrid[x, y] = level[y, x];
+                }
+            }
         }
         public void Draw()
         {
@@ -109,11 +137,12 @@ namespace ConsoleGames
         {
             Edit(pos.X, pos.Y, value);
         }
-        public void EditMove(int destX, int destY, int currX, int currY, int coverValue = 0)
+        public void Edit(List<Point2I> pos, int value)
         {
-            int value = LevelGrid[currX, currY];
-            Edit(currX, currY, coverValue);
-            Edit(destX, destY, value);
+            for (int i = 0; i < pos.Count; i++)
+            {
+                Edit(pos[i], value);
+            }
         }
         public void EditMove(Point2I destPos, Point2I currPos, int coverValue = 0)
         {

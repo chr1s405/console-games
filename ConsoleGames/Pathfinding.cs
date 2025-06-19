@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-//using static ConsoleGames.HelperMethods;
+using Utils;
 
 
 namespace ConsoleGames
@@ -19,23 +19,18 @@ namespace ConsoleGames
         {
 
             Level level = CreateLevel();
-            int[] start = new int[] { 10, 2 };
-            int[] end = new int[] { 15, 5 };
-            List<int[]> path = new List<int[]>();
-            path.Add(start);
-            path = FindPath(path, level, start, end);
+            Point2I start = new Point2I(10, 2);
+            Point2I end = new Point2I(15, 5);
+            List<Point2I> path = FindPath(level, start, end, true);
             for (int i = 0; i < path.Count; i++)
             {
                 start = path[i];
-                level.Reset();
                 level.Edit(path, 4);
-                level.Edit(start, 2);
                 level.Edit(end, 3);
-                level.Draw(levelCells);
+                level.Edit(start, 2);
+                level.Draw();
                 System.Threading.Thread.Sleep(50);
             }
-
-
         }
         public static Level CreateLevel()
         {
@@ -51,15 +46,16 @@ namespace ConsoleGames
                 {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
                 {1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-            });
+            }, levelCells);
         }
 
-        public static List<int[]> FindPath(List<int[]> path, Level level, int[] start, int[] end)
+        public static List<Point2I> FindPath(Level level, Point2I start, Point2I end, bool showPaths = false)
         {
             int counter = 0;
-            List<List<int[]>> visited = new List<List<int[]>>();
-            List<List<int[]>> queued = new List<List<int[]>>();
-            queued.Add(new List<int[]> { start });
+            List<Point2I> visited = new List<Point2I>();
+            List<List<Point2I>> queued = new List<List<Point2I>>();
+            queued.Add(new List<Point2I> { start });
+            List<Point2I> prevPath = new List<Point2I>();
             while (queued.Count != 0)
             {
                 counter++;
@@ -67,63 +63,56 @@ namespace ConsoleGames
                 {
                     return [];
                 }
-                List<int[]> currPath = queued.First();
+                List<Point2I> currPath = queued.First();
                 queued.Remove(queued.First());
-                if (currPath.Last()[0] == end[0] && currPath.Last()[1] == end[1])
+                if (currPath.Last() == end)
                 {
                     queued.Clear();
+                    return currPath;
                 }
-                else if (visited.Count != 0 && isPresent(visited, currPath.Last()))
+                else if (visited.Count != 0 && visited.Contains(currPath.Last()))
                 {
                     continue;
                 }
-                else if (level.LevelAccesor[currPath.Last()[1], currPath.Last()[0]] == 1)
+                else if (level.LevelGrid[currPath.Last().X, currPath.Last().Y] == 1)
                 {
                     continue;
                 }
                 else
                 {
-                    List<int[]> path1 = new List<int[]>(currPath);
-                    List<int[]> path2 = new List<int[]>(currPath);
-                    List<int[]> path3 = new List<int[]>(currPath);
-                    List<int[]> path4 = new List<int[]>(currPath);
-                    path1.Add([currPath.Last()[0] + 0, currPath.Last()[1] + 1]);
+                    List<Point2I> path1 = new List<Point2I>(currPath);
+                    List<Point2I> path2 = new List<Point2I>(currPath);
+                    List<Point2I> path3 = new List<Point2I>(currPath);
+                    List<Point2I> path4 = new List<Point2I>(currPath);
+                    path1.Add(currPath.Last() + (0, 1));
                     queued.Add(path1);
-                    path2.Add([currPath.Last()[0] + 0, currPath.Last()[1] - 1]);
+                    path2.Add(currPath.Last() - (0, 1));
                     queued.Add(path2);
-                    path3.Add([currPath.Last()[0] + 1, currPath.Last()[1] + 0]);
+                    path3.Add(currPath.Last() + (1, 0));
                     queued.Add(path3);
-                    path4.Add([currPath.Last()[0] - 1, currPath.Last()[1] + 0]);
+                    path4.Add(currPath.Last() - (1, 0));
                     queued.Add(path4);
                 }
-                visited.Add(currPath);
-                level.Reset();
-                level.Edit(visited.Last(), 4);
-                level.Edit(start, 2);
-                level.Edit(end, 3);
-                level.Draw(levelCells);
-                System.Threading.Thread.Sleep(20);
-            }
-            return visited.Last();
-        }
-        public static bool isPresent(List<List<int[]>> list, int[] arr)
-        {
-            for (int i = 0; i < list.Count; i++)
-            {
-                bool matches = true;
-                for (int j = 0; j < arr.GetLength(0); j++)
+                visited.Add(currPath.Last());
+
+                if (showPaths)
                 {
-                    if (list[i].Last()[j] != arr[j])
+                    foreach (Point2I pos in prevPath)
                     {
-                        matches = false;
+                        if (!currPath.Contains(pos))
+                        {
+                            level.Edit(pos, 0);
+                        }
                     }
-                }
-                if (matches)
-                {
-                    return true;
+                    level.Edit(currPath, 4);
+                    level.Edit(end, 3);
+                    level.Edit(start, 2);
+                    level.Draw();
+                    prevPath = currPath;
+                System.Threading.Thread.Sleep(20);
                 }
             }
-            return false;
+            return [];
         }
     }
 }
