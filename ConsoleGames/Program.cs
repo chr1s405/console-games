@@ -16,10 +16,14 @@ namespace ConsoleGames
             {
                 choice = 0;
                 Console.WriteLine("MENU");
+                Console.WriteLine("=== Games ===");
                 Console.WriteLine("1. GravityGame");
                 Console.WriteLine("2. Snake");
+                Console.WriteLine();
+                Console.WriteLine("=== Concepts ===");
                 Console.WriteLine("3. PathFinding");
                 Console.WriteLine("4. PathMapping");
+                Console.WriteLine("");
                 Console.WriteLine("0. quit");
                 Console.Write("Select option: ");
                 try
