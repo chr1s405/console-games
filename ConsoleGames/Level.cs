@@ -135,10 +135,14 @@ namespace ConsoleGames
                 Edit(pos[i], value);
             }
         }
-        public void EditMove(Point2I destPos, Point2I currPos, int coverValue = 0)
+        public void EditMove(Point2I destPos, Point2I currPos, int currValue = 0)
         {
-            Edit(destPos, LevelGrid[currPos]);
-            Edit(currPos, coverValue);
+            EditMove(destPos, LevelGrid[currPos], currPos, currValue);
+        }
+        public void EditMove(Point2I destPos, int destValue, Point2I currPos, int currValue = 0)
+        {
+            Edit(destPos, destValue);
+            Edit(currPos, currValue);
         }
         public void PrintLevel()
         {

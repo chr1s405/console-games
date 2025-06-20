@@ -38,8 +38,8 @@ namespace Utils
                 case Dir.right: return left + (1, 0); break;
                 case Dir.up: return left + (0, -1); break;
                 case Dir.down: return left + (0, 1); break;
+                default: return left; break;
             }
-            throw new Exception("there is no matching direction");
         }
         public static Point2I operator -(Point2I left, Point2I right)
         {
