@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,25 +29,24 @@ namespace ConsoleGames
     {
         private int width;
         private int height;
-        private int[,] levelGrid;
+        private Matrix levelGrid = new Matrix();
         private List<LevelCell> levelCells = new List<LevelCell>();
         private int consoleX;
         private int consoleY;
 
         public int Width { get => width; set => width = value; }
         public int Height { get => height; set => height = value; }
-        public int[,] LevelGrid { get => levelGrid; set => levelGrid = value; }
+        public Matrix LevelGrid { get => levelGrid; set => levelGrid = value; }
         public int ConsoleX { get => consoleX; set => consoleX = value; }
         public int ConsoleY { get => consoleY; set => consoleY = value; }
         public List<LevelCell> LevelCells { get => levelCells; set => levelCells = value; }
+        public int this[int x, int y] { get => levelGrid[x, y]; set => levelGrid[x, y] = value; }
+        public int this[Point2I pos] { get => levelGrid[pos.x, pos.y]; set => levelGrid[pos.x, pos.y] = value; }
 
-        public Level(int[,] level, List<LevelCell> cells = null)
+        private Level(List<LevelCell> cells = null)
         {
-            Width = level.GetLength(1);
-            Height = level.GetLength(0);
-            InitLevel(level);
             LevelCells.Add(new LevelCell(0, "  "));
-            LevelCells.Add(new LevelCell(1, "[]"));
+            LevelCells.Add(new LevelCell(1, "[]", ConsoleColor.DarkGray));
             if (cells is not null)
             {
                 foreach (LevelCell cell in cells)
@@ -54,55 +54,42 @@ namespace ConsoleGames
                     LevelCells.Add(cell);
                 }
             }
+            ConsoleX = int.MinValue;
+            ConsoleY = int.MinValue;
         }
-        public Level(int width, int height, List<LevelCell> cells = null)
+        public Level(Matrix level, List<LevelCell> cells = null) : this(cells)
+        {
+            LevelGrid = new Matrix(level);
+            Width = LevelGrid.GetWidth();
+            Height = levelGrid.GetHeight();
+        }
+        public Level(int width, int height, List<LevelCell> cells = null) : this(cells)
         {
             Width = width;
             Height = height;
-            InitLevel();
-            LevelCells.Add(new LevelCell(0, "  "));
-            LevelCells.Add(new LevelCell(1, "[]"));
-            if(cells is not null)
-            {
-                foreach(LevelCell cell in cells)
-                {
-                    LevelCells.Add(cell);
-                }
-            }
+            LevelGrid = InitLevel(width, height);
         }
-        public Level(int size) : this(size, size) { }
-        public void InitLevel()
+        public Matrix InitLevel(int size) { return InitLevel(size, size); }
+        public Matrix InitLevel(int width, int height)
         {
-            ConsoleX = Console.GetCursorPosition().Left;
-            ConsoleY = Console.GetCursorPosition().Top;
-            LevelGrid = new int[Width, Height];
-            for (int y = 1; y < Height; y++)
+            Matrix matrix = new Matrix(new int[height, width]);
+            for (int y = 1; y < height; y++)
             {
-                for (int x = 1; x < Width; x++)
+                for (int x = 1; x < width; x++)
                 {
-                    LevelGrid[x, y] = 0;
+                    matrix[x, y] = 0;
                 }
             }
-            for (int i = 0; i < Width; i++) { LevelGrid[i, 0] = 1; }
-            for (int i = 0; i < Width; i++) { LevelGrid[i, Height - 1] = 1; }
-            for (int i = 0; i < Height; i++) { LevelGrid[0, i] = 1; }
-            for (int i = 0; i < Height; i++) { LevelGrid[Width - 1, i] = 1; }
-        }
-        public void InitLevel(int[,] level)
-        {
-            ConsoleX = Console.GetCursorPosition().Left;
-            ConsoleY = Console.GetCursorPosition().Top;
-            LevelGrid = new int[Width, Height];
-            for (int y = 0; y < Height; y++)
-            {
-                for (int x = 0; x < Width; x++)
-                {
-                    LevelGrid[x, y] = level[y, x];
-                }
-            }
+            for (int i = 0; i < Width; i++) { matrix[i, 0] = 1; }
+            for (int i = 0; i < Width; i++) { matrix[i, Height - 1] = 1; }
+            for (int i = 0; i < Height; i++) { matrix[0, i] = 1; }
+            for (int i = 0; i < Height; i++) { matrix[Width - 1, i] = 1; }
+            return matrix;
         }
         public void Draw()
         {
+            ConsoleX = Console.GetCursorPosition().Left;
+            ConsoleY = Console.GetCursorPosition().Top;
             for (int y = 0; y < Height; y++)
             {
                 for (int x = 0; x < Width; x++)
@@ -114,28 +101,32 @@ namespace ConsoleGames
         }
         public void DrawPartial(int x, int y)
         {
+            int cursorPos = Console.CursorTop;
+            Console.SetCursorPosition(ConsoleX + x * 2, ConsoleY + y);
             int cellId = LevelGrid[x, y];
-            Console.SetCursorPosition(ConsoleX + x*2, ConsoleY + y);
             try
             {
                 Console.BackgroundColor = LevelCells[cellId].CellColor;
                 Console.Write(LevelCells[cellId].CellString);
                 Console.ResetColor();
             }
-            catch(ArgumentOutOfRangeException e)
+            catch (ArgumentOutOfRangeException e)
             {
                 Console.Write("##");
             }
-            Console.SetCursorPosition(0, ConsoleY + Height);
+            Console.SetCursorPosition(0, consoleX + Height);
         }
         public void Edit(int x, int y, int value)
         {
-            LevelGrid[x, y] = value;
-            DrawPartial(x, y);
+            this[x, y] = value;
+            if (ConsoleX >= 0 && ConsoleY >= 0)
+            {
+                DrawPartial(x, y);
+            }
         }
         public void Edit(Point2I pos, int value)
         {
-            Edit(pos.X, pos.Y, value);
+            Edit(pos.x, pos.y, value);
         }
         public void Edit(List<Point2I> pos, int value)
         {
@@ -146,11 +137,10 @@ namespace ConsoleGames
         }
         public void EditMove(Point2I destPos, Point2I currPos, int coverValue = 0)
         {
-            int value = LevelGrid[currPos.X, currPos.Y];
+            int value = LevelGrid[currPos.x, currPos.y];
             Edit(currPos, coverValue);
             Edit(destPos, value);
         }
-
         public void PrintLevel()
         {
             for (int y = 0; y < Height; y++)
@@ -161,6 +151,19 @@ namespace ConsoleGames
                 }
                 Console.WriteLine();
             }
+        }
+        public override string ToString()
+        {
+            string levelString = "";
+            for (int y = 0; y < Height; y++)
+            {
+                for (int x = 0; x < Width; x++)
+                {
+                    levelString += LevelGrid[x, y].ToString().PadRight(2);
+                }
+                levelString += "\n";
+            }
+            return levelString;
         }
     }
 }

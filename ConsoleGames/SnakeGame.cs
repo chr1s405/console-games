@@ -24,8 +24,9 @@ namespace ConsoleGames
             Snake snake = new Snake();
             Point2I coin = SpawnCoin(level, snake);
             int score = 0;
-            level.Edit(coin, 2);
             bool isEnd = false;
+            level.Draw();
+            level.Edit(coin, 2);
             while (!isEnd)
             {
                 level.Edit(snake.Body.Last(), 0);
@@ -38,7 +39,6 @@ namespace ConsoleGames
                 }
                 level.Edit(snake.Body[0], 3);
                 level.Edit(snake.Body[1], 4);
-                level.Draw();
                 Console.WriteLine($"score: {score}");
                 if (isDead(snake))
                 {
@@ -123,14 +123,15 @@ namespace ConsoleGames
             {
                 Body.Insert(0, Body[0] + newDir);
                 direction.Insert(0, newDir);
-                if (level.LevelGrid[Body[0].X, Body[0].Y] != 2) {
+                if (level[Body[0]] != 2)
+                {
                     Body.RemoveAt(Body.Count - 1);
                     direction.RemoveAt(Body.Count - 1);
                 }
-                if (Body[0].X == 0) { Body[0] = (level.Width - 2, Body[0].Y); }
-                if (Body[0].Y == 0) { Body[0] = (Body[0].X, level.Height - 2); }
-                if (Body[0].X == level.Width - 1) { Body[0] = (1, Body[0].Y); }
-                if (Body[0].Y == level.Height - 1) { Body[0] = (Body[0].X, 1); }
+                if (Body[0].x == 0) { Body[0] = (level.Width - 2, Body[0].y); }
+                if (Body[0].y == 0) { Body[0] = (Body[0].x, level.Height - 2); }
+                if (Body[0].x == level.Width - 1) { Body[0] = (1, Body[0].y); }
+                if (Body[0].y == level.Height - 1) { Body[0] = (Body[0].x, 1); }
             }
         }
     }

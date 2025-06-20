@@ -21,6 +21,7 @@ namespace ConsoleGames
             Level level = CreateLevel();
             Point2I start = new Point2I(10, 2);
             Point2I end = new Point2I(15, 5);
+            level.Draw();
             List<Point2I> path = FindPath(level, start, end, true);
             for (int i = 0; i < path.Count; i++)
             {
@@ -28,27 +29,9 @@ namespace ConsoleGames
                 level.Edit(path, 4);
                 level.Edit(end, 3);
                 level.Edit(start, 2);
-                level.Draw();
                 System.Threading.Thread.Sleep(50);
             }
         }
-        public static Level CreateLevel()
-        {
-            return new Level(
-            new int[,]{
-                {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1},
-                {1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1},
-                {1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1},
-                {1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1},
-                {1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1},
-                {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
-                {1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-            }, levelCells);
-        }
-
         public static List<Point2I> FindPath(Level level, Point2I start, Point2I end, bool showPaths = false)
         {
             int counter = 0;
@@ -74,7 +57,7 @@ namespace ConsoleGames
                 {
                     continue;
                 }
-                else if (level.LevelGrid[currPath.Last().X, currPath.Last().Y] == 1)
+                else if (level[currPath.Last()] == 1)
                 {
                     continue;
                 }
@@ -104,15 +87,30 @@ namespace ConsoleGames
                             level.Edit(pos, 0);
                         }
                     }
-                    level.Edit(currPath, 4);
+                    level.Edit(currPath.GetRange(1,currPath.Count-1), 4);
                     level.Edit(end, 3);
                     level.Edit(start, 2);
-                    level.Draw();
                     prevPath = currPath;
                 System.Threading.Thread.Sleep(20);
                 }
             }
             return [];
+        }
+        public static Level CreateLevel()
+        {
+            return new Level(
+            new Matrix(new int[,]{
+                {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
+                {1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1},
+                {1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1},
+                {1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1},
+                {1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1},
+                {1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1},
+                {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+                {1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
+                {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+            }), levelCells);
         }
     }
 }

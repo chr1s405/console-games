@@ -5,21 +5,15 @@ namespace Utils
     public enum Dir { up, right, down, left }
     public struct Point2I
     {
-        private int x;
-        private int y;
-        public int X { get => x; set => x = value; }
-        public int Y { get => y; set => y = value; }
+        public int x;
+        public int y;
 
-        public Point2I()
-        {
-            X = 0;
-            Y = 0;
-        }
         public Point2I(int x, int y)
         {
-            X = x;
-            Y = y;
+            this.x = x;
+            this.y = y;
         }
+        public Point2I() : this(0, 0) { }
         public static implicit operator Point2I((int x, int y) pos)
         {
             return new Point2I(pos.x, pos.y);
@@ -57,7 +51,7 @@ namespace Utils
         }
         public static bool operator ==(Point2I left, Point2I right)
         {
-            return left.X == right.X && left.Y == right.Y;
+            return left.x == right.x && left.y == right.y;
         }
         public static bool operator !=(Point2I left, Point2I right)
         {
@@ -72,7 +66,61 @@ namespace Utils
             if (obj is null || !(obj is Point2I))
                 return false;
 
-            return ((Point2I)obj).X == X && ((Point2I)obj).y == Y;
+            return ((Point2I)obj).x == x && ((Point2I)obj).y == y;
+        }
+    }
+    public struct Matrix
+    {
+        private int[,] array;
+        public int this[int x, int y] { get => array[x, y]; set => array[x, y] = value; }
+        public Matrix(Matrix matrix)
+        {
+            this.array = matrix.array;
+        }
+        public Matrix(int width, int height) : this(new int[height, width]) { }
+        public Matrix(int[,] array)
+        {
+            int rows = array.GetLength(0);
+            int cols = array.GetLength(1);
+            this.array = new int[cols, rows];
+            for (int row = 0; row < rows; row++)
+            {
+                for (int col = 0; col < cols; col++)
+                {
+                    this.array[col, row] = array[row, col];
+                }
+            }
+        }
+        public void Transpose()
+        {
+            int rows = array.GetLength(0);
+            int cols = array.GetLength(1);
+            int[,] arrCopy = new int[rows, cols];
+            Array.Copy(array, arrCopy, array.Length);
+            array = new int[cols, rows];
+            for (int y = 0; y < array.GetLength(1); y++)
+            {
+                for (int x = 0; x < array.GetLength(0); x++)
+                {
+                    array[x, y] = arrCopy[y, x];
+                }
+            }
+            arrCopy = null;
+        }
+        public int GetWidth() { return array.GetLength(0); }
+        public int GetHeight() { return array.GetLength(1); }
+        public override string ToString()
+        {
+            string arrString = "";
+            for (int y = 0; y < array.GetLength(1); y++)
+            {
+                for (int x = 0; x < array.GetLength(0); x++)
+                {
+                    arrString += ($"{array[x, y].ToString().PadRight(3)}");
+                }
+                arrString += ("\n");
+            }
+            return arrString;
         }
     }
 }
