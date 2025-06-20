@@ -73,6 +73,7 @@ namespace Utils
     {
         private int[,] array;
         public int this[int x, int y] { get => array[x, y]; set => array[x, y] = value; }
+        public int this[Point2I pos] { get => array[pos.x, pos.y]; set => array[pos.x, pos.y] = value; }
         public Matrix(Matrix matrix)
         {
             this.array = matrix.array;

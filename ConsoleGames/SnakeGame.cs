@@ -106,7 +106,7 @@ namespace ConsoleGames
         }
 
 
-        internal struct Snake
+        public struct Snake
         {
             private List<Point2I> body = new List<Point2I>();
             private List<Dir> direction = new List<Dir>();
