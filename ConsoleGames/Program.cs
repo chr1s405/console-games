@@ -22,6 +22,7 @@ namespace ConsoleGames
                 Console.WriteLine("=== Concepts ===");
                 Console.WriteLine("3. PathFinding");
                 Console.WriteLine("4. PathMapping");
+                Console.WriteLine("5. CameraTest");
                 Console.WriteLine("");
                 Console.WriteLine("0. quit");
                 Console.Write("Select option: ");
@@ -38,6 +39,7 @@ namespace ConsoleGames
                     //case 2: Play(new GravityGame()); break;
                     case 3: Play(new Pathfinding()); break;
                     case 4: Play(new PathMapping()); break;
+                    case 5: Play(new CameraTest()); break;
                     case -1: TryingThingsOut(); break;
                 }
                 Console.WriteLine($"Press enter to continue");

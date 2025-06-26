@@ -23,7 +23,7 @@ namespace ConsoleGames
         public PathMapping()
         {
             level = CreateLevel();
-            player = new Player((9, 4), level);
+            player = new Player((9, 4));
             enemy1 = new Enemy(level);
             enemy2 = new Enemy(level);
             enemy3 = new Enemy(level);
@@ -104,7 +104,7 @@ namespace ConsoleGames
         {
             private Point2I pos;
             public Point2I Pos { get => pos; set => pos = value; }
-            public Player(Point2I pos, Level level)
+            public Player(Point2I pos)
             {
                 Pos = pos;
             }
