@@ -2,7 +2,7 @@
 
 namespace Utils
 {
-    public enum Dir { up, right, down, left }
+    public enum Dir { none, up, right, down, left }
     public struct Point2I
     {
         public int x;

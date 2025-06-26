@@ -11,52 +11,76 @@ using static System.Formats.Asn1.AsnWriter;
 
 namespace ConsoleGames
 {
-    internal class PathMapping
+    internal class PathMapping : Game
     {
-        static List<LevelCell> levelCells = new List<LevelCell>{
-                new LevelCell(2,"/\\"),
-                new LevelCell(3,"=>"),
-                new LevelCell(4,"\\/"),
-                new LevelCell(5,"<="),
-                new LevelCell(6,"^^", ConsoleColor.Green),
-                new LevelCell(7,"°°", ConsoleColor.Red),
-                new LevelCell(8,"--", ConsoleColor.Red),
-            };
-        public static void Play()
+        Level level;
+        Player player;
+        Enemy enemy1;
+        Enemy enemy2;
+        Enemy enemy3;
+        Dir[,] pathMap;
+        bool hasMoved;
+        public PathMapping()
         {
-
-            Level level = CreateLevel();
-            Player player = new Player((9, 4));
-            Enemy enemy = new Enemy(level);
+            level = CreateLevel();
+            player = new Player((9, 4), level);
+            enemy1 = new Enemy(level);
+            enemy2 = new Enemy(level);
+            enemy3 = new Enemy(level);
+            pathMap = findPaths(level, player.Pos);
+            hasMoved = true;
+        }
+        public override void Initialize()
+        {
             level.Draw();
-            level.Edit(player.Pos, 6);
-            Matrix paths = findPaths(level, player.Pos, false);
-            bool isEnd = false;
-            Console.WriteLine("Press enter to exit");
-            Console.WriteLine(paths);
-            while (!isEnd)
+            for (int row = 0; row < pathMap.GetLength(1); row++)
             {
-                if (Console.KeyAvailable)
+                for (int col = 0; col < pathMap.GetLength(0); col++)
                 {
-                    ConsoleKey key = Console.ReadKey(true).Key;
-                    if (key == ConsoleKey.LeftArrow) { player.Move(level, Dir.left); }
-                    if (key == ConsoleKey.RightArrow) { player.Move(level, Dir.right); }
-                    if (key == ConsoleKey.UpArrow) { player.Move(level, Dir.up); }
-                    if (key == ConsoleKey.DownArrow) { player.Move(level, Dir.down); }
-                    if (key == ConsoleKey.Enter) { isEnd = true; }
-                    paths = findPaths(level, player.Pos, true);
-                    System.Threading.Thread.Sleep(100);
-                    enemy.Move(paths, level);
+                    switch (pathMap[col, row])
+                    {
+                        case Dir.up: MyConsole.Draw(col, row, "/\\", ConsoleColor.Gray); break;
+                        case Dir.right: MyConsole.Draw(col, row, "=>", ConsoleColor.Gray); break;
+                        case Dir.down: MyConsole.Draw(col, row, "\\/", ConsoleColor.Gray); break;
+                        case Dir.left: MyConsole.Draw(col, row, "<=", ConsoleColor.Gray); break;
+                    }
                 }
-                System.Threading.Thread.Sleep(100);
             }
         }
-        public static Matrix findPaths(Level level, Point2I start, bool showPaths = false)
+        public override void Update()
+        {
+            enemy1.Move(pathMap, level);
+            enemy2.Move(pathMap, level);
+            enemy3.Move(pathMap, level);
+            if (enemy1.Pos == player.Pos && enemy2.Pos == player.Pos && enemy3.Pos == player.Pos)
+            {
+                GameOver = true;
+            }
+        }
+        public override void Draw()
+        {
+            for (int i = level.RestorePos.Count - 1; i >= 0; i--)
+            {
+                Point2I pos = level.RestorePos[i];
+                switch (pathMap[pos.x, pos.y])
+                {
+                    case Dir.up: MyConsole.Draw(pos.x, pos.y, "/\\", ConsoleColor.Gray); break;
+                    case Dir.right: MyConsole.Draw(pos.x, pos.y, "=>", ConsoleColor.Gray); break;
+                    case Dir.down: MyConsole.Draw(pos.x, pos.y, "\\/", ConsoleColor.Gray); break;
+                    case Dir.left: MyConsole.Draw(pos.x, pos.y, "<=", ConsoleColor.Gray); break;
+                }
+                level.RestorePos.RemoveAt(level.RestorePos.Count - 1);
+            }
+            enemy1.Draw();
+            enemy2.Draw();
+            enemy3.Draw();
+            player.Draw();
+        }
+        public static Dir[,] findPaths(Level level, Point2I start)
         {
             List<Point2I> queued = new List<Point2I> { start };
             List<Point2I> visited = new List<Point2I>(queued);
-            Matrix paths = new Matrix(level.Width, level.Height);
-            paths[start] = 0;
+            Dir[,] pathMap = new Dir[level.Width, level.Height];
             int count = 0;
             while (queued.Count != 0 && count < 500)
             {
@@ -65,65 +89,57 @@ namespace ConsoleGames
                 queued.RemoveAt(0);
                 for (int i = 0; i < 4; i++)
                 {
-                    Point2I nextPos = currPos + (Dir)i;
-                    if (!visited.Contains(nextPos) && !new int[] { 1 }.Contains(level[nextPos]))
+                    Point2I nextPos = currPos + (Dir)(i + 1);
+                    if (!visited.Contains(nextPos) && !(level[nextPos] == 1))
                     {
-                        if (showPaths)
-                            level.Edit(nextPos, ((i + 2) % 4) + 2);
-                        paths[nextPos] = ((i + 2) % 4) + 1;
+                        pathMap[nextPos.x, nextPos.y] = (Dir)(((i + 2) % 4) + 1);
                         queued.Add(nextPos);
                         visited.Add(nextPos);
                     }
                 }
             }
-            return paths;
+            return pathMap;
         }
         public struct Player
         {
             private Point2I pos;
             public Point2I Pos { get => pos; set => pos = value; }
-            public Player(Point2I pos)
+            public Player(Point2I pos, Level level)
             {
                 Pos = pos;
             }
             public void Move(Level level, Dir dir)
             {
                 Point2I newPos = Pos + dir;
-                if (level[newPos] != 1)
+                if (!(level[newPos] == 1))
                 {
-                    level.EditMove(newPos, 6, Pos);
                     Pos += dir;
                 }
+            }
+            public void Draw()
+            {
+                MyConsole.Draw(Pos, "^^", ConsoleColor.Green);
             }
         }
         public struct Enemy
         {
             private Point2I pos;
-            private int knockOut = 0;
             public Point2I Pos { get => pos; set => pos = value; }
             public Enemy(Level level)
             {
                 Pos = GetRandomPosition(level);
-                level.Edit(Pos, 7);
             }
-            public void Move(Matrix pathMap, Level level)
+            public void Move(Dir[,] pathMap, Level level)
             {
-                if (knockOut == 0)
+                if (pathMap[Pos.x, Pos.y] != Dir.none)
                 {
-                    Point2I newPos = Pos + (Dir)(pathMap[Pos] - 1);
-                    level.EditMove(newPos, 7, Pos);
-                    Pos = newPos;
-                    //knockOut++;
+                    level.RestorePos.Add(Pos);
+                    Pos += pathMap[Pos.x, Pos.y];
                 }
-                else
-                {
-                    knockOut--;
-                    level.Edit(Pos, 8);
-                }
-                if ((Pos + (Dir)(pathMap[Pos] - 1) == Pos)) { 
-                    knockOut = 5;
-                    Pos = GetRandomPosition(level);
-                }
+            }
+            public void Draw()
+            {
+                MyConsole.Draw(Pos, "°°", ConsoleColor.Red);
             }
             private Point2I GetRandomPosition(Level level)
             {
@@ -135,24 +151,24 @@ namespace ConsoleGames
                     pos = (rand.Next(level.Width), rand.Next(level.Height));
                     count++;
                 }
-                while (level[pos] != 0 && count < 100);
+                while (!(level[pos] == 0) && count < 100);
                 return pos;
             }
         }
         public static Level CreateLevel()
         {
             return new Level(
-            new Matrix(new int[,]{
+            new int[,]{
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1},
                 {1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1},
-                {1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
-                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+                {1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1},
+                {1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+                {1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1},
+                {1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1},
+                {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
                 {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-            }), levelCells);
+            });
         }
     }
 }

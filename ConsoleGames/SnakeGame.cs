@@ -6,68 +6,62 @@ using System.Reflection.Emit;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Utils;
+using static ConsoleGames.SnakeGame;
 
 namespace ConsoleGames
 {
-
-    internal class SnakeGame
+    internal class SnakeGame : Game
     {
-        static List<LevelCell> levelCells = new List<LevelCell>{
-                new LevelCell(2, "o "),
-                new LevelCell(3, "[]", ConsoleColor.Green),
-                new LevelCell(4, "  ", ConsoleColor.Green),
-            };
-        public static void Play()
+        Snake snake;
+        Level level;
+        Point2I coin;
+        int score;
+        public SnakeGame()
         {
-            Level level = new Level(22, 12, levelCells);
-            Snake snake = new Snake();
-            Point2I coin = SpawnCoin(level, snake);
-            int score = 0;
-            bool isEnd = false;
-            level.Draw();
-            level.Edit(coin, 2);
-            while (!isEnd)
-            {
-                level.Edit(snake.Body.Last(), 0);
-                Move(snake, level);
-                if (snake.Body[0] == coin)
-                {
-                    score++;
-                    coin = SpawnCoin(level, snake);
-                    level.Edit(coin, 2);
-                }
-                level.Edit(snake.Body[0], 3);
-                level.Edit(snake.Body[1], 4);
-                Console.WriteLine($"score: {score}");
-                if (isDead(snake))
-                {
-                    isEnd = true;
-                    break;
-                }
-
-                System.Threading.Thread.Sleep(100);
-            }
+            snake = new Snake();
+            level = new Level(22, 12);
+            coin = SpawnCoin(level, snake);
+            score = 0;
         }
-
-        public static void Move(Snake snake, Level level)
+        public override void Initialize()
+        {
+            level.Draw();
+        }
+        override public void Update()
         {
             if (Console.KeyAvailable)
             {
                 ConsoleKey key = Console.ReadKey(true).Key;
-                if (snake.Direction[0] == Dir.up || snake.Direction[0] == Dir.down)
+                if (snake.Direction == Dir.up || snake.Direction == Dir.down)
                 {
-                    if (key == ConsoleKey.LeftArrow) { snake.Direction[0] = Dir.left; }
-                    if (key == ConsoleKey.RightArrow) { snake.Direction[0] = Dir.right; }
+                    if (key == ConsoleKey.LeftArrow) { snake.Direction = Dir.left; }
+                    if (key == ConsoleKey.RightArrow) { snake.Direction = Dir.right; }
                 }
-                if (snake.Direction[0] == Dir.left || snake.Direction[0] == Dir.right)
+                else
                 {
-                    if (key == ConsoleKey.UpArrow) { snake.Direction[0] = Dir.up; }
-                    if (key == ConsoleKey.DownArrow) { snake.Direction[0] = Dir.down; }
+                    if (key == ConsoleKey.UpArrow) { snake.Direction = Dir.up; }
+                    if (key == ConsoleKey.DownArrow) { snake.Direction = Dir.down; }
                 }
             }
-            snake.Move(snake.Direction[0], level);
+            snake.Move(level, coin);
+            if (coin == snake.Body[0])
+            {
+                score++;
+                coin = SpawnCoin(level, snake);
+            }
+            if (isDead(snake))
+                GameOver = true;
         }
+        override public void Draw()
+        {
+            snake.Draw();
+            MyConsole.Draw(coin, "0 ");
+            level.DrawRestore();
+        }
+
+
         public static bool isDead(Snake snake)
         {
             for (int i = 1; i < snake.Body.Count; i++)
@@ -100,39 +94,37 @@ namespace ConsoleGames
             } while (isOnSnake);
             return coin;
         }
-        public static bool CollectCoin(Snake snake, Point2I coin)
+    }
+    internal class Snake
+    {
+        private List<Point2I> body = new List<Point2I>();
+        private Dir direction;
+        public List<Point2I> Body { get => body; }
+        public Dir Direction { get => direction; set => direction = value; }
+        public Snake()
         {
-            return snake.Body[0] == coin;
+            Body.Add((2, 2));
+            Body.Add((1, 2));
+            direction = Dir.right;
         }
-
-
-        public struct Snake
+        public void Move(Level level, Point2I coin)
         {
-            private List<Point2I> body = new List<Point2I>();
-            private List<Dir> direction = new List<Dir>();
-            public List<Point2I> Body { get => body; }
-            public List<Dir> Direction { get => direction; }
-            public Snake()
+            Body.Insert(0, Body[0] + direction);
+            if (!(Body[0] == coin))
             {
-                Body.Add((2, 2));
-                direction.Add(Dir.right);
-                Body.Add((1, 2));
-                direction.Add(Dir.right);
+                level.RestorePos.Add(Body.Last());
+                Body.RemoveAt(Body.Count - 1);
             }
-            public void Move(Dir newDir, Level level)
-            {
-                Body.Insert(0, Body[0] + newDir);
-                direction.Insert(0, newDir);
-                if (level[Body[0]] != 2)
-                {
-                    Body.RemoveAt(Body.Count - 1);
-                    direction.RemoveAt(Body.Count - 1);
-                }
-                if (Body[0].x == 0) { Body[0] = (level.Width - 2, Body[0].y); }
-                if (Body[0].y == 0) { Body[0] = (Body[0].x, level.Height - 2); }
-                if (Body[0].x == level.Width - 1) { Body[0] = (1, Body[0].y); }
-                if (Body[0].y == level.Height - 1) { Body[0] = (Body[0].x, 1); }
-            }
+            if (Body[0].x == 0) { Body[0] = (level.Width - 2, Body[0].y); }
+            if (Body[0].y == 0) { Body[0] = (Body[0].x, level.Height - 2); }
+            if (Body[0].x == level.Width - 1) { Body[0] = (1, Body[0].y); }
+            if (Body[0].y == level.Height - 1) { Body[0] = (Body[0].x, 1); }
+        }
+        public void Draw()
+        {
+            if (Body.Count > 0)
+                MyConsole.Draw(body[1], "  ", ConsoleColor.Green);
+            MyConsole.Draw(body[0], "[]", ConsoleColor.Green);
         }
     }
 }

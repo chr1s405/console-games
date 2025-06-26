@@ -6,167 +6,332 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using Utils;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ConsoleGames
 {
-    public struct LevelCell
-    {
-        int cellId;
-        string cellString;
-        ConsoleColor cellColor;
-        public LevelCell(int id, string s, ConsoleColor color = ConsoleColor.Black)
-        {
-            CellId = id;
-            CellString = s;
-            CellColor = color;
-        }
 
-        public int CellId { get => cellId; set => cellId = value; }
-        public string CellString { get => cellString; set => cellString = value; }
-        public ConsoleColor CellColor { get => cellColor; set => cellColor = value; }
-    }
+    //public struct LevelGrid
+    //{
+    //    private List<int>[,] grid;
+
+    //    public int Width { get => grid.GetLength(0); }
+    //    public int Height { get => grid.GetLength(1); }
+    //    public List<int> this[int x, int y] { get => grid[x, y]; set => grid[x, y] = value; }
+    //    public List<int> this[Point2I pos] { get => this[pos.x, pos.y]; set => this[pos.x, pos.y] = value; }
+
+    //    public LevelGrid(int width, int height)
+    //    {
+    //        this.grid = new List<int>[width, height];
+    //        for (int row = 0; row < height; row++)
+    //        {
+    //            for (int col = 0; col < width; col++)
+    //            {
+    //                if (row == 0 || row == height - 1 || col == 0 || col == width - 1)
+    //                    this.grid[col, row] = new List<int> { 1 };
+    //                else
+    //                    this.grid[col, row] = new List<int> { 0 };
+    //            }
+    //        }
+    //    }
+    //    public LevelGrid(int[,] level)
+    //    {
+    //        int width = level.GetLength(1);
+    //        int height = level.GetLength(0);
+    //        this.grid = new List<int>[width, height];
+    //        for (int row = 0; row < height; row++)
+    //        {
+    //            for (int col = 0; col < width; col++)
+    //            {
+    //                this.grid[col, row] = new List<int> { level[row, col] };
+    //            }
+    //        }
+    //    }
+    //    public LevelGrid(List<int>[,] level)
+    //    {
+    //        int width = level.GetLength(1);
+    //        int height = level.GetLength(0);
+    //        this.grid = new List<int>[width, height];
+    //        for (int row = 0; row < height; row++)
+    //        {
+    //            for (int col = 0; col < width; col++)
+    //            {
+    //                this.grid[col, row] = new List<int>(level[col, row]);
+    //            }
+    //        }
+    //    }
+    //    public LevelGrid(LevelGrid level)
+    //    {
+    //        int width = level.Width;
+    //        int height = level.Height;
+    //        this.grid = new List<int>[width, height];
+    //        for (int row = 0; row < height; row++)
+    //        {
+    //            for (int col = 0; col < width; col++)
+    //            {
+    //                this.grid[col, row] = new List<int>(level.grid[col, row]);
+    //            }
+    //        }
+    //    }
+
+    //    public void Add(Point2I pos, int value, int index = -1)
+    //    {
+    //        if (index == -1)
+    //            this[pos].Add(value);
+    //        else
+    //            this[pos].Insert(index, value);
+    //    }
+    //    public void Remove(Point2I pos, int value)
+    //    {
+    //        this[pos].Remove(value);
+    //    }
+    //    public void RemoveAt(Point2I pos, int index)
+    //    {
+    //        this[pos].RemoveAt(index);
+    //    }
+    //    public void Move(Point2I pos, Point2I dest, int value, int newValue)
+    //    {
+    //        Remove(pos, value);
+    //        Add(dest, newValue);
+    //    }
+    //    public void Edit(Point2I pos, int value, int newValue)
+    //    {
+    //        for (int i = 0; i < this[pos].Count; i++)
+    //        {
+    //            if (this[pos][i] == value)
+    //            {
+    //                this[pos][i] = newValue; return;
+    //            }
+    //        }
+    //        throw new Exception($"{value} was not found in {ToString(pos.x, pos.y)}");
+    //    }
+    //    public void ToBottom(Point2I pos, int value)
+    //    {
+    //        this[pos].Insert(1, value);
+    //        Remove(pos, value);
+    //    }
+
+    //    public string ToString(int x, int y)
+    //    {
+    //        List<int> list = grid[x, y];
+    //        string listString = "";
+    //        for (int i = 0; i < list.Count; i++)
+    //        {
+    //            listString += $"{list[i]}{(i == list.Count - 1 ? "" : ",")}";
+    //        }
+    //        return $"[{listString}]";
+    //    }
+    //    public override string ToString()
+    //    {
+    //        string text = "";
+    //        int maxSize = 0;
+    //        foreach (List<int> list in grid)
+    //        {
+    //            if (list.Count > maxSize)
+    //                maxSize = list.Count;
+    //        }
+    //        text += "\n";
+    //        for (int row = 0; row < Height; row++)
+    //        {
+    //            for (int i = 0; i < maxSize; i++)
+    //            {
+    //                int leftPad = i + 2;
+    //                char leftPadChar = ' ';
+    //                int rightPad = maxSize + 2;
+    //                char rightPadChar = ' ';
+    //                for (int col = 0; col < Width; col++)
+    //                {
+    //                    if (i > this[col, row].Count - 1)
+    //                        text += ".".PadLeft(leftPad, leftPadChar).PadRight(rightPad, rightPadChar);
+    //                    else
+    //                        text += this[col, row][i].ToString().PadLeft(leftPad, leftPadChar).PadRight(rightPad, rightPadChar);
+    //                    if (col < Width - 1)
+    //                        text += "|";
+    //                }
+    //                text += "\n";
+    //            }
+    //            if (row < Height - 1)
+    //            {
+    //                for (int col = 0; col < Width; col++)
+    //                {
+    //                    text += "".PadRight(maxSize + 2, '-') + " ";
+    //                }
+    //                text += "\n";
+    //            }
+    //        }
+    //        return text;
+    //    }
+    //}
     internal class Level
     {
-        private int width;
-        private int height;
-        private Matrix levelGrid = new Matrix();
+        private int[,] grid;
         private List<LevelCell> levelCells = new List<LevelCell>();
-        private int consoleX;
+        private List<Point2I> restorePos = new List<Point2I>();
+        //private int consoleX;
         private int consoleY;
+        public int this[Point2I pos] { get => this[pos.x, pos.y]; }
+        public int this[int x, int y] { get => grid[x, y]; }
+        //public int[,] Grid { get => grid; }
+        public int Width { get => grid.GetLength(0); }
+        public int Height { get => grid.GetLength(1); }
+        public List<Point2I> RestorePos { get => restorePos; set => restorePos = value; }
 
-        public int Width { get => width; set => width = value; }
-        public int Height { get => height; set => height = value; }
-        public Matrix LevelGrid { get => levelGrid; set => levelGrid = value; }
-        public int ConsoleX { get => consoleX; set => consoleX = value; }
-        public int ConsoleY { get => consoleY; set => consoleY = value; }
-        public List<LevelCell> LevelCells { get => levelCells; set => levelCells = value; }
-        public int this[int x, int y] { get => levelGrid[x, y]; set => levelGrid[x, y] = value; }
-        public int this[Point2I pos] { get => levelGrid[pos.x, pos.y]; set => levelGrid[pos.x, pos.y] = value; }
-
+        public Level(int width, int height, List<LevelCell> cells = null) : this(cells)
+        {
+            this.grid = new int[width, height];
+            for (int row = 0; row < height; row++)
+            {
+                for (int col = 0; col < width; col++)
+                {
+                    if (row == 0 || row == height - 1 || col == 0 || col == width - 1)
+                        this.grid[col, row] = 1;
+                    else
+                        this.grid[col, row] = 0;
+                }
+            }
+        }
+        public Level(int[,] level, List<LevelCell> cells = null) : this(cells)
+        {
+            int width = level.GetLength(1);
+            int height = level.GetLength(0);
+            this.grid = new int[width, height];
+            for (int row = 0; row < height; row++)
+            {
+                for (int col = 0; col < width; col++)
+                {
+                    this.grid[col, row] = level[row, col];
+                }
+            }
+        }
         private Level(List<LevelCell> cells = null)
         {
-            LevelCells.Add(new LevelCell(0, "  "));
-            LevelCells.Add(new LevelCell(1, "[]", ConsoleColor.DarkGray));
+            levelCells.Add(new LevelCell(0, "  "));
+            levelCells.Add(new LevelCell(1, "[]", ConsoleColor.DarkGray));
             if (cells is not null)
             {
                 foreach (LevelCell cell in cells)
                 {
-                    LevelCells.Add(cell);
+                    levelCells.Add(cell);
                 }
             }
-            ConsoleX = int.MinValue;
-            ConsoleY = int.MinValue;
+            //this.consoleX = int.MinValue;
+            this.consoleY = int.MinValue;
         }
-        public Level(Matrix level, List<LevelCell> cells = null) : this(cells)
-        {
-            LevelGrid = new Matrix(level);
-            Width = LevelGrid.GetWidth();
-            Height = levelGrid.GetHeight();
-        }
-        public Level(int width, int height, List<LevelCell> cells = null) : this(cells)
-        {
-            Width = width;
-            Height = height;
-            LevelGrid = InitLevel(width, height);
-        }
-        public Matrix InitLevel(int size) { return InitLevel(size, size); }
-        public Matrix InitLevel(int width, int height)
-        {
-            Matrix matrix = new Matrix(new int[height, width]);
-            for (int y = 1; y < height; y++)
-            {
-                for (int x = 1; x < width; x++)
-                {
-                    matrix[x, y] = 0;
-                }
-            }
-            for (int i = 0; i < Width; i++) { matrix[i, 0] = 1; }
-            for (int i = 0; i < Width; i++) { matrix[i, Height - 1] = 1; }
-            for (int i = 0; i < Height; i++) { matrix[0, i] = 1; }
-            for (int i = 0; i < Height; i++) { matrix[Width - 1, i] = 1; }
-            return matrix;
-        }
+
         public void Draw()
         {
-            ConsoleX = Console.GetCursorPosition().Left;
-            ConsoleY = Console.GetCursorPosition().Top;
+            //consoleX = Console.GetCursorPosition().Left;
+            consoleY = Console.GetCursorPosition().Top;
             for (int y = 0; y < Height; y++)
             {
                 for (int x = 0; x < Width; x++)
                 {
-                    DrawPartial(x, y);
+                    Draw(x, y);
                 }
-                Console.WriteLine();
             }
         }
-        public void DrawPartial(int x, int y)
+        public void Draw(Point2I pos) { Draw(pos.x, pos.y); }
+        public void Draw(int x, int y)
         {
-            int cursorPos = Console.CursorTop;
-            Console.SetCursorPosition(ConsoleX + x * 2, ConsoleY + y);
-            int cellId = LevelGrid[x, y];
-            try
+            MyConsole.Draw((x, consoleY + y), levelCells[this[x, y]]);
+        }
+        public void DrawRestore()
+        {
+            for (int i = restorePos.Count - 1; i >= 0; i--)
             {
-                Console.BackgroundColor = LevelCells[cellId].CellColor;
-                Console.Write(LevelCells[cellId].CellString);
-                Console.ResetColor();
-            }
-            catch (ArgumentOutOfRangeException e)
-            {
-                Console.Write("##");
-            }
-            Console.SetCursorPosition(0, consoleX + Height);
-        }
-        public void Edit(int x, int y, int value)
-        {
-            this[x, y] = value;
-            if (ConsoleX >= 0 && ConsoleY >= 0)
-            {
-                DrawPartial(x, y);
+                Point2I pos = restorePos[i];
+                levelCells[this[pos]].DrawCell(pos.x, pos.y);
+                restorePos.RemoveAt(i);
             }
         }
-        public void Edit(Point2I pos, int value)
-        {
-            Edit(pos.x, pos.y, value);
-        }
-        public void Edit(List<Point2I> pos, int value)
-        {
-            for (int i = 0; i < pos.Count; i++)
-            {
-                Edit(pos[i], value);
-            }
-        }
-        public void EditMove(Point2I destPos, Point2I currPos, int currValue = 0)
-        {
-            EditMove(destPos, LevelGrid[currPos], currPos, currValue);
-        }
-        public void EditMove(Point2I destPos, int destValue, Point2I currPos, int currValue = 0)
-        {
-            Edit(destPos, destValue);
-            Edit(currPos, currValue);
-        }
-        public void PrintLevel()
-        {
-            for (int y = 0; y < Height; y++)
-            {
-                for (int x = 0; x < Width; x++)
-                {
-                    Console.Write(LevelGrid[x, y].ToString().PadRight(2));
-                }
-                Console.WriteLine();
-            }
-        }
+        //public void Add(Point2I pos, int value)
+        //{
+        //    grid.Add(pos, value);
+        //    if (consoleX >= 0 && consoleY >= 0)
+        //        DrawPartial(pos);
+        //}
+        //public void Add(List<Point2I> pos, int value)
+        //{
+        //    for (int i = 0; i < pos.Count; i++)
+        //    {
+        //        Add(pos[i], value);
+        //    }
+        //}
+        //public void AddToBottom(Point2I pos, int value)
+        //{
+        //    grid.Add(pos, value, 1);
+        //    if (consoleX >= 0 && consoleY >= 0)
+        //        DrawPartial(pos);
+        //}
+        //public void AddToBottom(List<Point2I> pos, int value)
+        //{
+        //    for (int i = 0; i < pos.Count; i++)
+        //    {
+        //        AddToBottom(pos[i], value);
+        //    }
+        //}
+        //public void Remove(Point2I pos, int value)
+        //{
+        //    grid.Remove(pos, value);
+        //    if (consoleX >= 0 && consoleY >= 0)
+        //        DrawPartial(pos);
+        //}
+        //public void Remove(List<Point2I> pos, int value)
+        //{
+        //    for (int i = 0; i < pos.Count; i++)
+        //    {
+        //        Remove(pos[i], value);
+        //    }
+        //}
+        //public void RemoveBottom(Point2I pos)
+        //{
+        //    grid.RemoveAt(pos, 1);
+        //    if (consoleX >= 0 && consoleY >= 0)
+        //        DrawPartial(pos);
+        //}
+        //public void Edit(Point2I pos, Point2I dest)
+        //{
+        //    Edit(pos, dest, grid[pos].Last());
+        //}
+        //public void Edit(Point2I pos, Point2I dest, int value)
+        //{
+        //    grid.Move(pos, dest, value, value);
+        //    if (consoleX >= 0 && consoleY >= 0)
+        //    { DrawPartial(pos); DrawPartial(dest); }
+        //}
+        //public void Edit(Point2I pos, Point2I dest, int value, int newValue)
+        //{
+        //    grid.Move(pos, dest, value, newValue);
+        //    if (consoleX >= 0 && consoleY >= 0)
+        //    { DrawPartial(pos); DrawPartial(dest); }
+
+        //}
+        //public void Edit(Point2I pos, int value)
+        //{
+        //    Edit(pos, grid[pos].Last(), value);
+        //}
+        //public void Edit(Point2I pos, int value, int newValue)
+        //{
+        //    grid.Edit(pos, value, newValue);
+        //    if (consoleX >= 0 && consoleY >= 0)
+        //        DrawPartial(pos);
+        //}
+        //public void ToTop(Point2I pos, int value)
+        //{
+        //    grid.Remove(pos, value);
+        //    grid.Add(pos, value);
+        //    if (consoleX >= 0 && consoleY >= 0)
+        //        DrawPartial(pos);
+        //}
+        //public void ToBottom(Point2I pos, int value)
+        //{
+        //    grid.ToBottom(pos, value);
+        //    if (consoleX >= 0 && consoleY >= 0)
+        //        DrawPartial(pos);
+        //}
         public override string ToString()
         {
-            string levelString = "";
-            for (int y = 0; y < Height; y++)
-            {
-                for (int x = 0; x < Width; x++)
-                {
-                    levelString += LevelGrid[x, y].ToString().PadRight(2);
-                }
-                levelString += "\n";
-            }
-            return levelString;
+            return grid.ToString();
         }
     }
 }

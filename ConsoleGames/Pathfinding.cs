@@ -8,29 +8,25 @@ using Utils;
 
 namespace ConsoleGames
 {
-    class Pathfinding
+    class Pathfinding : Game
     {
-        static List<LevelCell> levelCells = new List<LevelCell>{
-                new LevelCell(2,"  ", ConsoleColor.Green),
-                new LevelCell(3,"  ", ConsoleColor.Red),
-                new LevelCell(4,"  ", ConsoleColor.Gray),
-            };
-        public static void Play()
+        Level level;
+        Point2I start;
+        Point2I end;
+        List<Point2I> path = new List<Point2I>();
+        public Pathfinding()
         {
-
-            Level level = CreateLevel();
-            Point2I start = new Point2I(10, 2);
-            Point2I end = new Point2I(15, 5);
+            level = CreateLevel();
+            start = new Point2I(10, 2);
+            end = new Point2I(15, 5);
+        }
+        public override void Initialize()
+        {
             level.Draw();
-            List<Point2I> path = FindPath(level, start, end, true);
-            for (int i = 0; i < path.Count; i++)
-            {
-                start = path[i];
-                level.Edit(path, 4);
-                level.Edit(end, 3);
-                level.Edit(start, 2);
-                System.Threading.Thread.Sleep(50);
-            }
+            MyConsole.Draw(start, "  ", ConsoleColor.Green);
+            MyConsole.Draw(end, "  ", ConsoleColor.Red);
+            path = FindPath(level, start, end, true);
+            GameOver = true;
         }
         public static List<Point2I> FindPath(Level level, Point2I start, Point2I end, bool showPaths = false)
         {
@@ -83,15 +79,17 @@ namespace ConsoleGames
                     foreach (Point2I pos in prevPath)
                     {
                         if (!currPath.Contains(pos))
-                        {
-                            level.Edit(pos, 0);
-                        }
+                            MyConsole.Draw(pos, "  ");
                     }
-                    level.Edit(currPath.GetRange(1,currPath.Count-1), 4);
-                    level.Edit(end, 3);
-                    level.Edit(start, 2);
+                    for (int i = 0; i < currPath.Count; i++)
+                    {
+                        if (i == 0)
+                        { MyConsole.Draw(currPath[i], "  ", ConsoleColor.Green); }
+                        else
+                        { MyConsole.Draw(currPath[i], "  ", ConsoleColor.Gray); }
+                    }
                     prevPath = currPath;
-                System.Threading.Thread.Sleep(20);
+                    System.Threading.Thread.Sleep(20);
                 }
             }
             return [];
@@ -99,7 +97,7 @@ namespace ConsoleGames
         public static Level CreateLevel()
         {
             return new Level(
-            new Matrix(new int[,]{
+            new int[,]{
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
                 {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
                 {1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1},
@@ -110,7 +108,7 @@ namespace ConsoleGames
                 {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
                 {1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-            }), levelCells);
+            });
         }
     }
 }
