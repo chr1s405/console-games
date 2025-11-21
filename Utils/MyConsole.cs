@@ -1,55 +1,103 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 
 namespace Utils
 {
-    public struct LevelCell
-    {
-        private int cellId;
-        private string cellString;
-        private ConsoleColor cellColor;
-        private ConsoleColor fontColor;
-        public string CellString { get => cellString; }
-        public ConsoleColor BgColor { get => cellColor; }
-        public ConsoleColor FgColor { get => fontColor; }
-        public LevelCell(int id, string cellString, ConsoleColor bgColor = ConsoleColor.Black, ConsoleColor fontColor = ConsoleColor.White)
-        {
-            this.cellId = id;
-            this.cellString = cellString;
-            this.cellColor = bgColor;
-            this.fontColor = fontColor;
-        }
-
-        public void DrawCell(int x, int y)
-        {
-            MyConsole.Draw(x, y, cellString, cellColor, fontColor);
-        }
-    }
     static public class MyConsole
     {
-        static public void Draw(int x, int y, string value, ConsoleColor bgColor = ConsoleColor.Black, ConsoleColor fgColor = ConsoleColor.White)
+        private struct GridCell
         {
-            int lastCursorY = Console.CursorTop; // has to be the max cursory
-            bool changeBgColor = Console.BackgroundColor != bgColor;
-            bool changeFgColor = Console.ForegroundColor != fgColor;
-            if (changeBgColor)
-                Console.BackgroundColor = bgColor;
-            if (changeFgColor)
-                Console.ForegroundColor = fgColor;
-
-            Console.SetCursorPosition(x * 2, y);
-            Console.Write(value);
-
-            if (changeBgColor || changeFgColor)
-                Console.ResetColor();
-            Console.SetCursorPosition(0, lastCursorY);
+            public string Sprite;
+            public ConsoleColor ForegroundColor;
+            public ConsoleColor BackgroundColor;
+            public GridCell(GridCell cell)
+            {
+                Sprite = cell.Sprite;
+                BackgroundColor = cell.BackgroundColor;
+                ForegroundColor = cell.ForegroundColor;
+            }
+            public GridCell(string sprite = "  ", ConsoleColor fgColor = ConsoleColor.White, ConsoleColor bgColor = ConsoleColor.Black)
+            {
+                Sprite = sprite;
+                BackgroundColor = bgColor;
+                ForegroundColor = fgColor;
+            }
+            static public bool operator ==(GridCell left, GridCell right)
+            {
+                return (left.Sprite == right.Sprite) && (left.BackgroundColor == right.BackgroundColor) && (left.ForegroundColor == right.ForegroundColor);
+            }
+            static public bool operator !=(GridCell left, GridCell right)
+            {
+                return !(left == right);
+            }
         }
-        static public void Draw(Point2I pos, string value, ConsoleColor bgColor = ConsoleColor.Black, ConsoleColor fgColor = ConsoleColor.White)
-        { Draw(pos.x, pos.y, value, bgColor, fgColor); }
-        static public void Draw(Point2I pos, LevelCell cell)
-        { Draw(pos, cell.CellString, cell.BgColor, cell.FgColor); }
+        static private GridCell[,] grid = new GridCell[0, 0];
+        static private GridCell[,] onScreenGrid = new GridCell[0, 0];
+        static public void Init(int width, int height)
+        {
+            grid = new GridCell[width, height];
+            onScreenGrid = new GridCell[width, height];
+        }
+        static public void SetCell(Point2I pos, string sprite, ConsoleColor bgColor = ConsoleColor.Black, ConsoleColor fgColor = ConsoleColor.White)
+        {
+            if (pos.x > grid.GetLength(0) || pos.y > grid.GetLength(1))
+                Resize(Math.Max(grid.GetLength(0), pos.x), Math.Max(grid.GetLength(1), pos.y));
+            grid[pos.x, pos.y].Sprite = sprite;
+            grid[pos.x, pos.y].BackgroundColor = bgColor;
+            grid[pos.x, pos.y].ForegroundColor = fgColor;
+        }
+        static public void Draw()
+        {
+            for (int row = 0; row < Camera.Height; row++)
+            {
+                for (int col = 0; col < Camera.Width; col++)
+                {
+                    GridCell cell = grid[col + Camera.X, row + Camera.Y];
+                    if (cell != onScreenGrid[col, row])
+                    {
+                        if (Console.ForegroundColor != cell.ForegroundColor)
+                            Console.ForegroundColor = cell.ForegroundColor;
+                        if (Console.BackgroundColor != cell.BackgroundColor)
+                            Console.BackgroundColor = cell.BackgroundColor;
+                        Console.CursorLeft = col * 2;
+                        Console.CursorTop = row;
+                        Console.Write(cell.Sprite.PadRight(2));
+                        onScreenGrid[col, row] = new GridCell(cell);
+                    }
+                }
+            }
+
+            Console.CursorLeft = 0;
+            Console.CursorTop = Camera.Height;
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.BackgroundColor = ConsoleColor.Black;
+        }
+        static public void Draw2()
+        {
+            Console.Clear();
+            for (int row = 0; row < Camera.Height; row++)
+            {
+                string text = "";
+                for (int col = 0; col < Camera.Width; col++)
+                {
+                    GridCell cell = grid[col + Camera.X, row + Camera.Y];
+                    text += cell.Sprite.PadRight(2);
+                }
+                Console.WriteLine(text);
+            }
+        }
+        static private void Resize(int width, int height)
+        {
+            GridCell[,] newGrid = new GridCell[width, height];
+            for (int row = 0; row < grid.GetLength(1); row++)
+            {
+                for (int col = 0; col < grid.GetLength(1); col++)
+                {
+                    newGrid[col, row] = grid[col, row];
+                }
+            }
+            grid = newGrid;
+            newGrid = null;
+        }
     }
 }

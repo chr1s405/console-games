@@ -1,9 +1,5 @@
-﻿using System.Runtime.CompilerServices;
-using System.IO;
-using System.Reflection;
-using Microsoft.Win32.SafeHandles;
-using System.Xml.Serialization;
-using Utils;
+﻿using Utils;
+using Snake;
 
 namespace ConsoleGames
 {
@@ -18,11 +14,11 @@ namespace ConsoleGames
                 Console.WriteLine("=== Games ===");
                 Console.WriteLine("1. Snake");
                 //Console.WriteLine("2. GravityGame");
+                Console.WriteLine("3. CameraTest");
                 Console.WriteLine();
                 Console.WriteLine("=== Concepts ===");
-                Console.WriteLine("3. PathFinding");
-                Console.WriteLine("4. PathMapping");
-                Console.WriteLine("5. CameraTest");
+                Console.WriteLine("10. PathFinding");
+                Console.WriteLine("11. PathMapping");
                 Console.WriteLine("");
                 Console.WriteLine("0. quit");
                 Console.Write("Select option: ");
@@ -35,11 +31,11 @@ namespace ConsoleGames
                 catch { choice = 0; }
                 switch (choice)
                 {
-                    case 1: Play(new SnakeGame()); break;
+                    case 1: Play(new Snake.Game()); break;
                     //case 2: Play(new GravityGame()); break;
-                    case 3: Play(new Pathfinding()); break;
-                    case 4: Play(new PathMapping()); break;
-                    case 5: Play(new CameraTest()); break;
+                    //case 3: Play(new NewGame()); break;
+                    //case 10: Play(new Pathfinding()); break;
+                    //case 11: Play(new PathMapping()); break;
                     case -1: TryingThingsOut(); break;
                 }
                 Console.WriteLine($"Press enter to continue");
@@ -48,7 +44,7 @@ namespace ConsoleGames
             } while (choice != 0);
             Console.WriteLine("Thanks for playing");
         }
-        static public void Play(Game game)
+        static public void Play(Utils.Game game)
         {
             game.Initialize();
             while (!game.GameOver)
@@ -57,6 +53,7 @@ namespace ConsoleGames
                 game.Draw();
                 System.Threading.Thread.Sleep(100);
             }
+            Console.WriteLine(game.Message);
         }
         static public void TryingThingsOut()
         {

@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace Utils
+﻿namespace Utils
 {
     public enum Dir { none, up, right, down, left }
     public struct Point2I
@@ -48,6 +46,10 @@ namespace Utils
         public static Point2I operator -(Point2I left, Dir dir)
         {
             return -(-left + dir);
+        }
+        public static Point2I operator *(Point2I left, int right)
+        {
+            return (left.x * right, left.y * right);
         }
         public static bool operator ==(Point2I left, Point2I right)
         {
