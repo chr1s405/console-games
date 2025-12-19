@@ -6,7 +6,6 @@ namespace Utils
     {
         protected int[,] grid;
         protected List<LevelCell> levelCells = new List<LevelCell>();
-        //private Camera camera;
         public int this[Point2I pos] { get => this[pos.x, pos.y]; }
         public int this[int x, int y] { get => grid[x, y]; }
         public int Width { get => grid.GetLength(0); }
@@ -46,7 +45,7 @@ namespace Utils
         public Level(List<LevelCell> cells = null)
         {
             levelCells.Add(new LevelCell(levelCells.Count, "  "));
-            levelCells.Add(new LevelCell(levelCells.Count, "[]"));
+            levelCells.Add(new LevelCell(levelCells.Count, "[]", ConsoleColor.DarkGray));
             if (cells is not null)
             {
                 foreach (LevelCell cell in cells)
@@ -55,6 +54,17 @@ namespace Utils
                 }
             }
         }
-        public abstract void Draw();
+        public virtual void Draw()
+        {
+            for (int row = 0; row < Height; row++)
+            {
+                for (int col = 0; col < Width; col++)
+                {
+                    LevelCell cell = levelCells[grid[col, row]];
+                    MyConsole.SetCell((col, row), cell.CellString, cell.BgColor, cell.FgColor);
+                }
+            }
+
+        }
     }
 }

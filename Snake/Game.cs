@@ -2,7 +2,7 @@
 
 namespace Snake
 {
-    public class Game: Utils.Game
+    public class Game : Utils.Game
     {
         Snake snake;
         Level level;
@@ -39,7 +39,6 @@ namespace Snake
             {
                 score++;
                 coin.SpawnCoin(level, snake.Body);
-                Console.WriteLine($"Score: {score}");
             }
             GameOver = snake.IsDead();
             if (GameOver) Message = $"Game Over";
@@ -51,7 +50,8 @@ namespace Snake
             snake.Draw();
 
             MyConsole.Draw();
+            Console.WriteLine($"Score: {score}");
         }
-        
+
     }
 }

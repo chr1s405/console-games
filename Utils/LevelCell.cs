@@ -4,17 +4,17 @@
     {
         private int cellId;
         private string cellString;
-        //private ConsoleColor cellColor;
-        //private ConsoleColor fontColor;
+        private ConsoleColor bgColor;
+        private ConsoleColor fgColor;
         public string CellString { get => cellString; }
-        //public ConsoleColor BgColor { get => cellColor; }
-        //public ConsoleColor FgColor { get => fontColor; }
-        public LevelCell(int id, string cellString)
+        public ConsoleColor BgColor { get => bgColor; }
+        public ConsoleColor FgColor { get => fgColor; }
+        public LevelCell(int id, string cellString, ConsoleColor bgColor = ConsoleColor.Black, ConsoleColor fgColor = ConsoleColor.White)
         {
             this.cellId = id;
             this.cellString = cellString;
-            //this.cellColor = bgColor;
-            //this.fontColor = fontColor;
+            this.bgColor = bgColor;
+            this.fgColor = fgColor;
         }
     }
 }
