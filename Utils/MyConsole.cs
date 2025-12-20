@@ -33,7 +33,7 @@ namespace Utils
         }
         static private GridCell[,] grid = new GridCell[0, 0];
         static private GridCell[,] onScreenGrid = new GridCell[0, 0];
-        static public void Init(int width, int height)
+        static public void Init(int width = 10, int height = 10)
         {
             grid = new GridCell[width, height];
             onScreenGrid = new GridCell[width, height];
@@ -48,11 +48,11 @@ namespace Utils
         }
         static public void Draw()
         {
-            for (int row = 0; row < Camera.Height; row++)
+            for (int row = 0; row < grid.GetLength(1); row++)
             {
-                for (int col = 0; col < Camera.Width; col++)
+                for (int col = 0; col < grid.GetLength(0); col++)
                 {
-                    GridCell cell = grid[col + Camera.X, row + Camera.Y];
+                    GridCell cell = grid[col, row];
                     if (cell != onScreenGrid[col, row])
                     {
                         if (Console.ForegroundColor != cell.ForegroundColor)
@@ -68,17 +68,17 @@ namespace Utils
             }
 
             Console.CursorLeft = 0;
-            Console.CursorTop = Camera.Height;
+            Console.CursorTop = grid.GetLength(1);
             Console.ForegroundColor = ConsoleColor.White;
             Console.BackgroundColor = ConsoleColor.Black;
         }
         static public void Draw2()
         {
             Console.Clear();
-            for (int row = 0; row < Camera.Height; row++)
+            for (int row = 0; row < grid.GetLength(0); row++)
             {
                 string text = "";
-                for (int col = 0; col < Camera.Width; col++)
+                for (int col = 0; col < grid.GetLength(1); col++)
                 {
                     GridCell cell = grid[col + Camera.X, row + Camera.Y];
                     text += cell.Sprite.PadRight(2);
@@ -89,15 +89,19 @@ namespace Utils
         static private void Resize(int width, int height)
         {
             GridCell[,] newGrid = new GridCell[width, height];
+            GridCell[,] newScreenGrid = new GridCell[width, height];
             for (int row = 0; row < grid.GetLength(1); row++)
             {
                 for (int col = 0; col < grid.GetLength(1); col++)
                 {
                     newGrid[col, row] = grid[col, row];
+                    newScreenGrid[col, row] = onScreenGrid[col, row];
                 }
             }
             grid = newGrid;
+            onScreenGrid = newScreenGrid;
             newGrid = null;
+            newScreenGrid = null;
         }
     }
 }
