@@ -1,5 +1,4 @@
 ﻿using Utils;
-using Snake;
 
 namespace ConsoleGames
 {
@@ -13,6 +12,7 @@ namespace ConsoleGames
                 Console.WriteLine("MENU");
                 Console.WriteLine("=== Games ===");
                 Console.WriteLine("1. Snake");
+                Console.WriteLine("2.  ");
                 //Console.WriteLine("2. GravityGame");
                 Console.WriteLine("3. CameraTest");
                 Console.WriteLine();
@@ -32,6 +32,7 @@ namespace ConsoleGames
                 switch (choice)
                 {
                     case 1: Play(new Snake.Game()); break;
+                    case 2: Play(null); break;
                     //case 2: Play(new GravityGame()); break;
                     //case 3: Play(new NewGame()); break;
                     //case 10: Play(new Pathfinding()); break;

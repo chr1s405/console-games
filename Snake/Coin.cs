@@ -4,7 +4,8 @@ namespace Snake
 {
     internal class Coin
     {
-        public Point2I Pos;
+        Point2I pos;
+        public Point2I Pos { get => pos;}
         public Coin(Level level, List<Point2I> snake)
         {
             SpawnCoin(level, snake);
@@ -26,11 +27,11 @@ namespace Snake
                     }
                 }
             } while (isOnSnake);
-            Pos = newPos;
+            pos = newPos;
         }
         public void Draw()
         {
-            MyConsole.SetCell(Pos, "  ", ConsoleColor.Red);
+            MyConsole.SetCell(pos, "  ", ConsoleColor.Red);
         }
     }
 }

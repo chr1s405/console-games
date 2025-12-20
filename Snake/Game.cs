@@ -11,7 +11,6 @@ namespace Snake
         public override void Initialize()
         {
             snake = new Snake();
-            snake = new Snake();
             level = new Level(22, 12);
             coin = new Coin(level, snake.Body);
             score = 0;

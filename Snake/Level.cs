@@ -1,10 +1,12 @@
-﻿using Utils;
-
+﻿
 namespace Snake
 {
-    public class Level: Utils.Level
+    internal class Level: Utils.Level
     {
-        public Level(int width, int height, List<LevelCell> levelCells = null) : base(width, height, levelCells) { }
-        
+        public Level(int width, int height): base(width, height, new List<Utils.LevelCell>())
+        {
+            levelCells.Add(new Utils.LevelCell(levelCells.Count,"  "));
+            levelCells.Add(new Utils.LevelCell(levelCells.Count,"[]",ConsoleColor.DarkGray));
+        }
     }
 }

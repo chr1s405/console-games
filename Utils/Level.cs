@@ -1,8 +1,9 @@
 ﻿using System.Net.Http.Headers;
+using System.Reflection.Emit;
 
 namespace Utils
 {
-    public abstract class Level
+    public class Level
     {
         protected int[,] grid;
         protected List<LevelCell> levelCells = new List<LevelCell>();
@@ -25,7 +26,7 @@ namespace Utils
                         this.grid[col, row] = 0;
                 }
             }
-            Camera.Init(width, height);
+            Camera.Init(Width, Height);
         }
         public Level(int[,] level, List<LevelCell> cells = null)
             : this(cells)
@@ -40,13 +41,16 @@ namespace Utils
                     this.grid[col, row] = level[row, col];
                 }
             }
-            Camera.Init(width, height);
+            Camera.Init(Width, Height);
         }
         public Level(List<LevelCell> cells = null)
         {
-            levelCells.Add(new LevelCell(levelCells.Count, "  "));
-            levelCells.Add(new LevelCell(levelCells.Count, "[]", ConsoleColor.DarkGray));
-            if (cells is not null)
+            if (cells is null)
+            {
+                levelCells.Add(new LevelCell(levelCells.Count, "  "));
+                levelCells.Add(new LevelCell(levelCells.Count, "[]", ConsoleColor.DarkGray));
+            }
+            else
             {
                 foreach (LevelCell cell in cells)
                 {
