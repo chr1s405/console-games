@@ -41,9 +41,22 @@ namespace Utils
         static public void SetCell(Point2I pos, string sprite, ConsoleColor bgColor = ConsoleColor.Black, ConsoleColor fgColor = ConsoleColor.White)
         {
             if (pos.x >= grid.GetLength(0) || pos.y >= grid.GetLength(1))
-                Resize(Math.Max(grid.GetLength(0), pos.x+1), Math.Max(grid.GetLength(1), pos.y+1));
+                Resize(Math.Max(grid.GetLength(0), pos.x + 1), Math.Max(grid.GetLength(1), pos.y + 1));
             grid[pos.x, pos.y].Sprite = sprite;
             grid[pos.x, pos.y].BackgroundColor = bgColor;
+            grid[pos.x, pos.y].ForegroundColor = fgColor;
+        }
+        static public void SetBackground(Point2I pos, ConsoleColor bgColor = ConsoleColor.Black)
+        {
+            if (pos.x >= grid.GetLength(0) || pos.y >= grid.GetLength(1))
+                Resize(Math.Max(grid.GetLength(0), pos.x + 1), Math.Max(grid.GetLength(1), pos.y + 1));
+            grid[pos.x, pos.y].BackgroundColor = bgColor;
+        }
+        static public void SetForeGround(Point2I pos, string sprite, ConsoleColor fgColor = ConsoleColor.White)
+        {
+            if (pos.x >= grid.GetLength(0) || pos.y >= grid.GetLength(1))
+                Resize(Math.Max(grid.GetLength(0), pos.x + 1), Math.Max(grid.GetLength(1), pos.y + 1));
+            grid[pos.x, pos.y].Sprite = sprite;
             grid[pos.x, pos.y].ForegroundColor = fgColor;
         }
         static public void Draw()
@@ -72,27 +85,13 @@ namespace Utils
             Console.ForegroundColor = ConsoleColor.White;
             Console.BackgroundColor = ConsoleColor.Black;
         }
-        static public void Draw2()
-        {
-            Console.Clear();
-            for (int row = 0; row < grid.GetLength(0); row++)
-            {
-                string text = "";
-                for (int col = 0; col < grid.GetLength(1); col++)
-                {
-                    GridCell cell = grid[col + Camera.X, row + Camera.Y];
-                    text += cell.Sprite.PadRight(2);
-                }
-                Console.WriteLine(text);
-            }
-        }
         static private void Resize(int width, int height)
         {
             GridCell[,] newGrid = new GridCell[width, height];
             GridCell[,] newScreenGrid = new GridCell[width, height];
             for (int row = 0; row < grid.GetLength(1); row++)
             {
-                for (int col = 0; col < grid.GetLength(1); col++)
+                for (int col = 0; col < grid.GetLength(0); col++)
                 {
                     newGrid[col, row] = grid[col, row];
                     newScreenGrid[col, row] = onScreenGrid[col, row];
