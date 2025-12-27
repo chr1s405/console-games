@@ -69,12 +69,12 @@ namespace Chess
             }
             public void Draw()
             {
-                MyConsole.SetForeGround(Pos, Character, Owner == 0 ? ConsoleColor.White : ConsoleColor.Black);
+                MyConsole.SetForeGround(Pos + (1,1), Character, Owner == 0 ? ConsoleColor.White : ConsoleColor.Black);
             }
         }
         public class FootSoldier : Pawn
         {
-            public FootSoldier(int owner, Point2I pos) : base(owner, pos, "o") { }
+            public FootSoldier(int owner, Point2I pos) : base(owner, pos, "i") { }
         }
         public class King : Pawn
         {
@@ -90,11 +90,11 @@ namespace Chess
         }
         public class Horse : Pawn
         {
-            public Horse(int owner, Point2I pos) : base(owner, pos, "P") { }
+            public Horse(int owner, Point2I pos) : base(owner, pos, "F") { }
         }
         public class Bisshop : Pawn
         {
-            public Bisshop(int owner, Point2I pos) : base(owner, pos, "V") { }
+            public Bisshop(int owner, Point2I pos) : base(owner, pos, "/") { }
         }
     }
 }
