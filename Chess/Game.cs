@@ -5,16 +5,14 @@ namespace Chess
 {
     public class Game : Utils.Game
     {
-        Board board;
+        ChessBoard board;
         int turn = 0;
         string command;
         List<Pawn> army1;
         List<Pawn> army2;
         public override void Initialize()
         {
-            board = new Board();
-            army1 = InitializePawns(0);
-            army2 = InitializePawns(1);
+            board = new ChessBoard();
 
             MyConsole.Init(board.Width, board.Height);
             Draw();
@@ -27,34 +25,8 @@ namespace Chess
         public override void Draw()
         {
             board.Draw();
-            foreach (var pawn in army1)
-            {
-                pawn.Draw();
-            }
-            foreach (var pawn in army2)
-            {
-                pawn.Draw();
-            }
             MyConsole.Draw();
             Console.WriteLine(turn == 0 ? "Player 1's turn" : "Player 2's turn" + ":");
-        }
-        public List<Pawn> InitializePawns(int owner)
-        {
-            List<Pawn> army = new List<Pawn>();
-            for (int i = 0; i < 8; i++)
-            {
-                army.Add(new FootSoldier(owner, owner == 0 ? (i, 1) : (i, 6)));
-            }
-            army.Add(new King(owner, owner == 0 ? (4, 0) : (4, 7)));
-            army.Add(new Queen(owner, owner == 0 ? (3, 0) : (3, 7)));
-            army.Add(new Tower(owner, owner == 0 ? (0, 0) : (0, 7)));
-            army.Add(new Tower(owner, owner == 0 ? (7, 0) : (7, 7)));
-            army.Add(new Horse(owner, owner == 0 ? (1, 0) : (1, 7)));
-            army.Add(new Horse(owner, owner == 0 ? (6, 0) : (6, 7)));
-            army.Add(new Bisshop(owner, owner == 0 ? (2, 0) : (2, 7)));
-            army.Add(new Bisshop(owner, owner == 0 ? (5, 0) : (5, 7)));
-
-            return army;
         }
         public abstract class Pawn
         {
@@ -67,10 +39,10 @@ namespace Chess
                 Pos = pos;
                 Character = character;
             }
-            public void Draw()
-            {
-                MyConsole.SetForeGround(Pos + (1,1), Character, Owner == 0 ? ConsoleColor.White : ConsoleColor.Black);
-            }
+            //public void Draw()
+            //{
+            //    MyConsole.SetForeGround(Pos + (1,1), Character, Owner == 0 ? ConsoleColor.White : ConsoleColor.Black);
+            //}
         }
         public class FootSoldier : Pawn
         {
