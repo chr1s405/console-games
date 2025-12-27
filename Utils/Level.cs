@@ -16,17 +16,6 @@ namespace Utils
             : this(cells)
         {
             this.grid = new int[width, height];
-            for (int row = 0; row < height; row++)
-            {
-                for (int col = 0; col < width; col++)
-                {
-                    if (row == 0 || row == height - 1 || col == 0 || col == width - 1)
-                        this.grid[col, row] = 1;
-                    else
-                        this.grid[col, row] = 0;
-                }
-            }
-            Camera.Init(Width, Height);
         }
         public Level(int[,] level, List<LevelCell> cells = null)
             : this(cells)
@@ -34,28 +23,16 @@ namespace Utils
             int width = level.GetLength(1);
             int height = level.GetLength(0);
             this.grid = new int[width, height];
-            for (int row = 0; row < height; row++)
-            {
-                for (int col = 0; col < width; col++)
-                {
-                    this.grid[col, row] = level[row, col];
-                }
-            }
-            Camera.Init(Width, Height);
         }
         public Level(List<LevelCell> cells = null)
         {
             if (cells is null)
             {
                 levelCells.Add(new LevelCell(levelCells.Count, "  "));
-                levelCells.Add(new LevelCell(levelCells.Count, "[]", ConsoleColor.DarkGray));
             }
             else
             {
-                foreach (LevelCell cell in cells)
-                {
-                    levelCells.Add(cell);
-                }
+                levelCells = cells;
             }
         }
         public virtual void Draw()

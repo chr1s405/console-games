@@ -12,8 +12,11 @@ namespace ConsoleGames
                 Console.WriteLine("MENU");
                 Console.WriteLine("=== Games ===");
                 Console.WriteLine("1. Snake");
-                Console.WriteLine("2.  ");
-                Console.WriteLine("3. CameraTest");
+                Console.WriteLine("2. Chess");
+                Console.WriteLine("3. ");
+                Console.WriteLine("4. ");
+                Console.WriteLine("5. ");
+                Console.WriteLine("6. ");
                 Console.WriteLine();
                 Console.WriteLine("=== Concepts ===");
                 Console.WriteLine("10. PathFinding");
@@ -31,7 +34,8 @@ namespace ConsoleGames
                 switch (choice)
                 {
                     case 1: Play(new Snake.Game()); break;
-                    case 2: Play(null); break;
+                    case 2: Play(new Chess.Game()); break;
+                    case 3: Play(null); break;
                     //case 10: Play(new Pathfinding()); break;
                     //case 11: Play(new PathMapping()); break;
                     case 12: Play(new Tests.InventoryTest()); break;

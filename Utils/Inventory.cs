@@ -11,7 +11,7 @@ namespace Utils
         {
             items = new List<Item>();
             this.capacity = capacity;
-            width = 10;
+            width = 5;
             height = (int)Math.Ceiling(capacity / (float)width);
         }
 
