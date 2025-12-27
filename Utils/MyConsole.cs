@@ -52,7 +52,7 @@ namespace Utils
                 Resize(Math.Max(grid.GetLength(0), pos.x + 1), Math.Max(grid.GetLength(1), pos.y + 1));
             grid[pos.x, pos.y].BackgroundColor = bgColor;
         }
-        static public void SetForeGround(Point2I pos, string sprite, ConsoleColor fgColor = ConsoleColor.White)
+        static public void SetForeground(Point2I pos, string sprite, ConsoleColor fgColor = ConsoleColor.White)
         {
             if (pos.x >= grid.GetLength(0) || pos.y >= grid.GetLength(1))
                 Resize(Math.Max(grid.GetLength(0), pos.x + 1), Math.Max(grid.GetLength(1), pos.y + 1));
