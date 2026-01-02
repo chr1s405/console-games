@@ -40,6 +40,10 @@ namespace Utils
         }
         static public void SetCell(Point2I pos, string sprite, ConsoleColor bgColor = ConsoleColor.Black, ConsoleColor fgColor = ConsoleColor.White)
         {
+            if (pos.x < 0)
+                pos.x = grid.GetLength(0) + pos.x + 1;
+            if (pos.y < 0)
+                pos.y = grid.GetLength(1) - pos.y + 1;
             if (pos.x >= grid.GetLength(0) || pos.y >= grid.GetLength(1))
                 Resize(Math.Max(grid.GetLength(0), pos.x + 1), Math.Max(grid.GetLength(1), pos.y + 1));
             grid[pos.x, pos.y].Sprite = sprite;
@@ -48,16 +52,13 @@ namespace Utils
         }
         static public void SetBackground(Point2I pos, ConsoleColor bgColor = ConsoleColor.Black)
         {
-            if (pos.x >= grid.GetLength(0) || pos.y >= grid.GetLength(1))
-                Resize(Math.Max(grid.GetLength(0), pos.x + 1), Math.Max(grid.GetLength(1), pos.y + 1));
-            grid[pos.x, pos.y].BackgroundColor = bgColor;
+            GridCell cell = grid[pos.x, pos.y];
+            SetCell(pos, cell.Sprite, bgColor, cell.ForegroundColor);
         }
         static public void SetForeground(Point2I pos, string sprite, ConsoleColor fgColor = ConsoleColor.White)
         {
-            if (pos.x >= grid.GetLength(0) || pos.y >= grid.GetLength(1))
-                Resize(Math.Max(grid.GetLength(0), pos.x + 1), Math.Max(grid.GetLength(1), pos.y + 1));
-            grid[pos.x, pos.y].Sprite = sprite;
-            grid[pos.x, pos.y].ForegroundColor = fgColor;
+            GridCell cell = grid[pos.x, pos.y];
+            SetCell(pos, sprite, cell.BackgroundColor, fgColor);
         }
         static public void Draw()
         {
@@ -84,6 +85,17 @@ namespace Utils
             Console.CursorTop = grid.GetLength(1);
             Console.ForegroundColor = ConsoleColor.White;
             Console.BackgroundColor = ConsoleColor.Black;
+        }
+        static public void Write(string text = "")
+        {
+            Console.WriteLine(new string(' ', Console.BufferWidth));
+            Console.CursorTop = Console.CursorTop - 1;
+            Console.Write(text);
+        }
+        static public void WriteLine(string text = "")
+        {
+            Write(text);
+            Console.WriteLine();
         }
         static private void Resize(int width, int height)
         {

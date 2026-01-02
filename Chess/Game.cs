@@ -8,9 +8,7 @@ namespace Chess
     {
         ChessBoard board;
         int turn = 0;
-        string command;
-        List<ChessPiece> army1;
-        List<ChessPiece> army2;
+        string command = "";
         public override void Initialize()
         {
             board = new ChessBoard();
@@ -20,8 +18,7 @@ namespace Chess
         }
         public override void Update()
         {
-            command = Console.ReadLine();
-            Console.WriteLine(ChessBoard.GetPosFromBoard(command).ToString());
+            command = Console.ReadLine() ?? "";
             if (!board.HasActivePiece)
             {
                 board.TakePiece(command, turn);
@@ -33,16 +30,31 @@ namespace Chess
                     turn = (turn + 1) % 2;
                 }
             }
+            if (board.IsGameOver)
+            {
+                GameOver = true;
+            }
         }
         public override void Draw()
         {
             board.Draw();
 
             MyConsole.Draw();
-            Console.WriteLine(turn == 0 ? "Player 1's turn" : "Player 2's turn" + ":");
-            if (board.HasActivePiece)
+            Console.WriteLine();
+
+            if (!GameOver)
             {
-                Console.Write(ChessBoard.GetChessPos(board.ActivePiece.Pos) + " -> ");
+                Console.WriteLine(turn == 0 ? "White's turn" : "Black's turn" + ":");
+                MyConsole.Write("input: ");
+                if (board.HasActivePiece)
+                {
+                    Console.Write(ChessBoard.GetChessPos(board.ActivePiece.Pos) + " -> ");
+                }
+            }
+            else
+            {
+                MyConsole.WriteLine((turn == 0 ? "Black" : "White") + " won");
+                MyConsole.Write();
             }
         }
 

@@ -7,11 +7,13 @@ namespace Chess
     {
         ChessPiece[,] board = new ChessPiece[8, 8];
         ChessPiece activePiece = null;
+        bool isGameOver = false;
         public int Width { get => board.GetLength(0); }
         public int Height { get => board.GetLength(1); }
         public ChessPiece[,] Board { get => board; }
         public bool HasActivePiece { get => activePiece is not null; }
         public ChessPiece ActivePiece { get => activePiece; }
+        public bool IsGameOver { get => isGameOver; }
         public ChessBoard()
         {
             for (int i = 0; i < 8; i++)
@@ -62,9 +64,15 @@ namespace Chess
             Point2I pos = GetPosFromBoard(chessPos);
             if (activePiece.GetValidMoves(board).Contains(pos))
             {
+                ChessPiece chessPiece = board[pos.x, pos.y];
+
                 board[activePiece.Pos.x, activePiece.Pos.y] = null;
+                if (chessPiece is not null && chessPiece.GetType() == typeof(King))
+                {
+                    isGameOver = true;
+                }
                 board[pos.x, pos.y] = activePiece;
-                board[pos.x, pos.y].Pos = pos;
+                activePiece.Move(pos);
                 activePiece = null;
                 return true;
             }
@@ -107,20 +115,17 @@ namespace Chess
             }
             if (activePiece is not null)
             {
-                //MyConsole.SetForeground((activePiece.Pos) + (1, 1), activePiece.Character, ConsoleColor.DarkYellow);
                 MyConsole.SetBackground((activePiece.Pos) + (1, 1), ConsoleColor.DarkYellow);
                 List<Point2I> moves = activePiece.GetValidMoves(board);
                 foreach (Point2I move in moves)
                 {
                     if (board[move.x, move.y] is null)
                     {
-                        //MyConsole.SetForeground(move + (1, 1), "x", activePiece.Owner == 0 ? ConsoleColor.White : ConsoleColor.Black);
                         MyConsole.SetForeground(move + (1, 1), "x", activePiece.Owner == 0 ? ConsoleColor.DarkYellow : ConsoleColor.DarkYellow);
                     }
                     else
                     {
                         MyConsole.SetForeground(move + (1, 1), board[move.x, move.y].Character, ConsoleColor.Red);
-                        //MyConsole.SetBackground(move + (1, 1), ConsoleColor.Red);
                     }
                 }
             }

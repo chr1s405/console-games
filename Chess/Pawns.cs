@@ -16,12 +16,22 @@ namespace Chess
             Character = character;
         }
         public abstract List<Point2I> GetValidMoves(ChessPiece[,] board);
+        public virtual void Move(Point2I pos)
+        {
+            Pos = pos;
+        }
     }
     public class Pawn : ChessPiece
     {
         bool isFirstMove = true;
         public Pawn(int owner, Point2I pos) : base(owner, pos, "i") { }
+        public override void Move(Point2I pos)
+        {
+            base.Move(pos);
+            if (isFirstMove)
+                isFirstMove = false;
 
+        }
         public override List<Point2I> GetValidMoves(ChessPiece[,] board)
         {
             List<Point2I> moves = new List<Point2I>();
