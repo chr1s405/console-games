@@ -48,7 +48,7 @@ namespace Chess
                 MyConsole.Write("input: ");
                 if (board.HasActivePiece)
                 {
-                    Console.Write(ChessBoard.GetChessPos(board.ActivePiece.Pos) + " -> ");
+                    Console.Write(ChessBoard.GetChessPos(board.ActivePos) + " -> ");
                 }
             }
             else

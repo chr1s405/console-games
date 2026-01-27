@@ -1,4 +1,5 @@
-﻿using Utils;
+﻿using System.Security.AccessControl;
+using Utils;
 using static Chess.Game;
 
 namespace Chess
@@ -7,42 +8,44 @@ namespace Chess
     {
         ChessPiece[,] board = new ChessPiece[8, 8];
         ChessPiece activePiece = null;
+        Point2I activePos = (-1,-1);
         bool isGameOver = false;
         public int Width { get => board.GetLength(0); }
         public int Height { get => board.GetLength(1); }
         public ChessPiece[,] Board { get => board; }
         public bool HasActivePiece { get => activePiece is not null; }
         public ChessPiece ActivePiece { get => activePiece; }
+        public Point2I ActivePos { get => activePos; }
         public bool IsGameOver { get => isGameOver; }
         public ChessBoard()
         {
+            List<ChessPiece> whites = new List<ChessPiece> {
+                (new Rook(0)),
+                (new Knight(0)),
+                (new Bisshop(0)),
+                (new Queen(0)),
+                (new King(0)),
+                (new Bisshop(0)),
+                (new Knight(0)),
+                (new Rook(0)),
+            };
+
+            List<ChessPiece> blacks = new List<ChessPiece> {
+                (new Rook(1)),
+                (new Knight(1)),
+                (new Bisshop(1)),
+                (new Queen(1)),
+                (new King(1)),
+                (new Bisshop(1)),
+                (new Knight(1)),
+                (new Rook(1)),
+            };
             for (int i = 0; i < 8; i++)
             {
-                board[i, 1] = (new Pawn(1, (i, 1)));
-                board[i, 6] = (new Pawn(0, (i, 6)));
-            }
-            List<ChessPiece> pieces = new List<ChessPiece> {
-                (new King(1, (4, 0))),
-                (new Queen(1, (3, 0))),
-                (new Tower(1, (0, 0))),
-                (new Tower(1, (7, 0))),
-                (new Horse(1, (1, 0))),
-                (new Horse(1, (6, 0))),
-                (new Bisshop(1, (2, 0))),
-                (new Bisshop(1, (5, 0))),
-
-                (new King(0, (4, 7))),
-                (new Queen(0, (3, 7))),
-                (new Tower(0, (0, 7))),
-                (new Tower(0, (7, 7))),
-                (new Horse(0, (1, 7))),
-                (new Horse(0, (6, 7))),
-                (new Bisshop(0, (2, 7))),
-                (new Bisshop(0, (5, 7))),
-            };
-            foreach (ChessPiece piece in pieces)
-            {
-                board[piece.Pos.x, piece.Pos.y] = piece;
+                board[i, 0] = blacks[i];
+                board[i, 1] = (new Pawn(1));
+                board[i, 6] = (new Pawn(0));
+                board[i, 7] = whites[i];
             }
         }
         public bool TakePiece(string chessPos, int owner)
@@ -54,6 +57,7 @@ namespace Chess
                 if (piece is not null && piece.Owner == owner)
                 {
                     activePiece = piece;
+                    activePos = pos;
                     return true;
                 }
             }
@@ -62,18 +66,40 @@ namespace Chess
         public bool PlacePiece(string chessPos)
         {
             Point2I pos = GetPosFromBoard(chessPos);
-            if (activePiece.GetValidMoves(board).Contains(pos))
+            if (activePiece.GetValidMoves(board, activePos).Contains(pos))
             {
                 ChessPiece chessPiece = board[pos.x, pos.y];
 
-                board[activePiece.Pos.x, activePiece.Pos.y] = null;
+                board[activePos.x, activePos.y] = null;
+                board[pos.x, pos.y] = activePiece;
+                if(activePiece.GetType() == typeof(Pawn))
+                {
+                    if (((Pawn)activePiece).IsFirstMove)
+                    {
+                        ((Pawn)activePiece).IsFirstMove = false;
+                    }
+                    if (pos.y == (activePiece.Owner == 0 ? 0 : 7))
+                    {
+                        int choice = ((Pawn)activePiece).Transform();
+                        ChessPiece newPiece;
+                        switch (choice)
+                        {
+                            case 1: newPiece = new Queen(activePiece.Owner); break;
+                            case 2: newPiece = new Bisshop(activePiece.Owner); break;
+                            case 3: newPiece = new Knight(activePiece.Owner); break;
+                            case 4: newPiece = new Rook(activePiece.Owner); break;
+                            default: newPiece = board[pos.x, pos.y]; break;
+                        }
+                        board[pos.x, pos.y] = newPiece;
+                        MyConsole.Clear();
+                        MyConsole.Draw();
+                    }
+                }
+                activePiece = null;
                 if (chessPiece is not null && chessPiece.GetType() == typeof(King))
                 {
                     isGameOver = true;
                 }
-                board[pos.x, pos.y] = activePiece;
-                activePiece.Move(pos);
-                activePiece = null;
                 return true;
             }
             activePiece = null;
@@ -115,8 +141,8 @@ namespace Chess
             }
             if (activePiece is not null)
             {
-                MyConsole.SetBackground((activePiece.Pos) + (1, 1), ConsoleColor.DarkYellow);
-                List<Point2I> moves = activePiece.GetValidMoves(board);
+                MyConsole.SetBackground((activePos) + (1, 1), ConsoleColor.DarkYellow);
+                List<Point2I> moves = activePiece.GetValidMoves(board, activePos);
                 foreach (Point2I move in moves)
                 {
                     if (board[move.x, move.y] is null)
@@ -140,7 +166,7 @@ namespace Chess
             int y = 0;
             try
             {
-                x = Convert.ToInt32("abcdefg".IndexOf(pos.Substring(0, 1).ToLower()));
+                x = Convert.ToInt32("abcdefgh".IndexOf(pos.Substring(0, 1).ToLower()));
                 y = 8 - Convert.ToInt32(pos.Substring(1, 1));
             }
             catch (Exception e) { return (-1, -1); }

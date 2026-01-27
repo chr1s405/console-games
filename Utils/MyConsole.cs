@@ -38,14 +38,19 @@ namespace Utils
             grid = new GridCell[width, height];
             onScreenGrid = new GridCell[width, height];
         }
+        static public void Clear()
+        {
+            onScreenGrid = new GridCell[grid.GetLength(0), grid.GetLength(1)];
+            Console.Clear();
+        }
         static public void SetCell(Point2I pos, string sprite, ConsoleColor bgColor = ConsoleColor.Black, ConsoleColor fgColor = ConsoleColor.White)
         {
+            if (pos.x >= grid.GetLength(0) || pos.y >= grid.GetLength(1))
+                Resize(Math.Max(grid.GetLength(0), pos.x + 1), Math.Max(grid.GetLength(1), pos.y + 1));
             if (pos.x < 0)
                 pos.x = grid.GetLength(0) + pos.x + 1;
             if (pos.y < 0)
                 pos.y = grid.GetLength(1) - pos.y + 1;
-            if (pos.x >= grid.GetLength(0) || pos.y >= grid.GetLength(1))
-                Resize(Math.Max(grid.GetLength(0), pos.x + 1), Math.Max(grid.GetLength(1), pos.y + 1));
             grid[pos.x, pos.y].Sprite = sprite;
             grid[pos.x, pos.y].BackgroundColor = bgColor;
             grid[pos.x, pos.y].ForegroundColor = fgColor;
